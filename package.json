@@ -1,0 +1,90 @@
+{
+  "name": "desk-watch",
+  "productName": "Desk Watch",
+  "version": "0.1.0-beta",
+  "description": "Webcam study focus watcher for Windows. Everything stays on your computer.",
+  "main": "dist-electron/main.js",
+  "private": true,
+  "scripts": {
+    "assets": "node scripts/assets.mjs",
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc -p electron && vite build",
+    "start": "npm run build && electron .",
+    "selftest": "npm run build && electron . --selftest",
+    "replay": "npm run build && electron . --replay",
+    "dataset": "npm run build && electron . --replay export",
+    "train": "train\\.venv\\Scripts\\python.exe train/train.py",
+    "test": "vitest run",
+    "dist": "npm run build && electron-builder --win nsis",
+    "release-check": "node scripts/release-check.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@mediapipe/tasks-vision": "^1.1.0",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
+    "get-windows": "^9.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.3"
+  },
+  "license": "MIT",
+  "author": "Hrishin Debnath",
+  "build": {
+    "appId": "io.github.deskwatch",
+    "productName": "Desk Watch",
+    "copyright": "Copyright (c) 2026 Hrishin Debnath",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "!dist-electron/testhooks.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "extension",
+        "to": "extension"
+      },
+      {
+        "from": "node_modules/get-windows/lib/binding/napi-9-win32-unknown-x64",
+        "to": "native"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE"
+      },
+      {
+        "from": "THIRD_PARTY_NOTICES.md",
+        "to": "THIRD_PARTY_NOTICES.md"
+      }
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Desk-Watch-Setup-${version}.exe"
+    }
+  }
+}

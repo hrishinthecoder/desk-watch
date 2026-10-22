@@ -1,0 +1,23 @@
+node_modules/
+dist/
+dist-electron/
+release/
+# Downloaded/copied by `npm run assets` (bundled into the app at build time)
+public/models/*
+public/wasm/
+# ...except our own trained hand-object model (owner, 2026-10-22: in the repo, so a fresh copy works)
+!public/models/desk_objects.tflite
+!public/models/desk_objects.labels.json
+# Test clips contain your face. Never commit them.
+clips/
+*.webm
+# Training environment and datasets (hand crops from your clips stay on this computer)
+train/.venv/
+train/__pycache__/
+# Retrained models not chosen (yet): kept on this computer to switch to later
+train/candidates/
+# Test report written by the rtk tool
+.vitest/
+
+# Screenshots for the owner to review (made-up data); never published
+/shots-for-review/

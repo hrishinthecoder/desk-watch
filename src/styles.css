@@ -1,0 +1,838 @@
+/* "Night Desk" design system (2026-10-23, the owner's canvas; DESIGN.md). Dark is the default; light follows Windows
+   or Settings → Theme. Periwinkle = focus and go; red = alarm and nothing else; amber = a warning before an alarm and
+   "overdue". Every state also has a word and a shape. One typeface (Anek Bangla, Latin + Bangla), 4 px spacing base.
+   Contrast checked on the canvas (dark: text 16.1:1, text-2 8.0:1, text-3 5.8:1 on bg; light: 17:1, 6.4:1, 4.8:1). */
+@font-face {
+  font-family: 'Anek Bangla';
+  src: url('/fonts/AnekBangla-Variable.ttf') format('truetype');
+  font-weight: 100 800; font-stretch: 75% 125%; font-display: block;
+}
+:root, .focus { /* Focus mode stays dark for now (its backgrounds are dark); light Focus comes with the light-theme group */
+  /* Dark */
+  --focus-bg: #000000; --bg: #101114; --surface: #16181C; --surface-2: #1F2228; --raised: #1A1C21; --border: #2A2E37;
+  --text: #ECEDF1; --text-2: #A6AAB5; --text-3: #8B909C; --text-quiet: #C3C6CF; --text-off: #6E7380;
+  --accent: #8FA8FF; --accent-hover: #A9BBFF; --accent-soft: #232A45; --accent-dim: #3A4D99; --on-accent: #0B1030; --link: #A9BBFF;
+  --btn: #23262D; --btn-hover: #2E323B; --btn-off: #181A1F; --seg-bg: #181A1F; --seg-on: #2A2E37;
+  --alarm: #FF6B6B; --alarm-text: #FF8A8A; --alarm-bg: #1C0A0C; --alarm-soft: #2A1114; --on-alarm: #1C0A0C;
+  --warn: #F2B24C; --warn-bg: #2A1E0A; --warn-line: #5C4216; --warn-track: #4A3618; --warn-text: #E0C79C;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --scroll-thumb: #3A3E48; --scroll-thumb-hover: #5A5F6C;
+  color-scheme: dark;
+  /* Spacing (4 px base), radius, sizes */
+  --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px; --s6: 48px; --gutter: 28px;
+  --r-chip: 8px; --r-input: 10px; --radius: 12px; --r-dialog: 16px;
+  --h-primary: 56px; --h-btn: 44px; --h-small: 36px;
+  --font: 'Anek Bangla', 'Segoe UI', sans-serif;
+  /* Older names used across the screens */
+  --muted: var(--text-2); --line: var(--border); --panel: var(--surface); --focused: var(--accent);
+  --alert: var(--alarm); --on-alert: var(--on-alarm);
+  --c-phone: var(--alarm); --c-call: var(--alarm-text); --c-down: var(--warn); --c-away: var(--text-3); --c-break: var(--text-2);
+}
+/* Light: chosen in Settings, or Windows is light and the setting follows it. */
+:root[data-theme="light"] {
+  --focus-bg: #FBFAF7; --bg: #F6F6F8; --surface: #FFFFFF; --surface-2: #ECEEF3; --raised: #FFFFFF; --border: #D9DBE2;
+  --text: #15171C; --text-2: #555B68; --text-3: #6A7080; --text-quiet: #3D4250; --text-off: #8E93A0;
+  --accent: #3B55D0; --accent-hover: #2F47B8; --accent-soft: #E6EBFF; --accent-dim: #AFBDF0; --on-accent: #FFFFFF; --link: #3B55D0;
+  --btn: #ECEEF3; --btn-hover: #E1E4EB; --btn-off: #F1F2F5; --seg-bg: #ECEEF3; --seg-on: #FFFFFF;
+  --alarm: #C42B30; --alarm-text: #B0252A; --alarm-bg: #FFF1F1; --alarm-soft: #FDE3E3; --on-alarm: #FFFFFF;
+  --warn: #8A5200; --warn-bg: #FFF4E0; --warn-line: #E8C98E; --warn-track: #F2DDB4; --warn-text: #6B4300;
+  --scrim: rgba(21, 23, 28, 0.45);
+  --scroll-thumb: #C5C9D3; --scroll-thumb-hover: #A3A8B4;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --focus-bg: #FBFAF7; --bg: #F6F6F8; --surface: #FFFFFF; --surface-2: #ECEEF3; --raised: #FFFFFF; --border: #D9DBE2;
+    --text: #15171C; --text-2: #555B68; --text-3: #6A7080; --text-quiet: #3D4250; --text-off: #8E93A0;
+    --accent: #3B55D0; --accent-hover: #2F47B8; --accent-soft: #E6EBFF; --accent-dim: #AFBDF0; --on-accent: #FFFFFF; --link: #3B55D0;
+    --btn: #ECEEF3; --btn-hover: #E1E4EB; --btn-off: #F1F2F5; --seg-bg: #ECEEF3; --seg-on: #FFFFFF;
+    --alarm: #C42B30; --alarm-text: #B0252A; --alarm-bg: #FFF1F1; --alarm-soft: #FDE3E3; --on-alarm: #FFFFFF;
+    --warn: #8A5200; --warn-bg: #FFF4E0; --warn-line: #E8C98E; --warn-track: #F2DDB4; --warn-text: #6B4300;
+    --scrim: rgba(21, 23, 28, 0.45);
+    --scroll-thumb: #C5C9D3; --scroll-thumb-hover: #A3A8B4;
+    color-scheme: light;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 15px/1.5 var(--font); }
+:lang(bn) body, html[lang="bn"] body { line-height: 1.6; }
+a { color: var(--link); }
+
+/* ---- Components (DS-Components board) ---- */
+/* Buttons: secondary by default (44), primary (56), small (36), quiet, danger. Disabled has its own colours. */
+button { font: inherit; color: var(--text); background: var(--btn); border: 0; border-radius: var(--radius); min-height: var(--h-btn);
+  padding: 0 18px; font-weight: 600; cursor: pointer; }
+button:hover:not(:disabled) { background: var(--btn-hover); }
+button:disabled { background: var(--btn-off); color: var(--text-off); cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button.primary, button.primary-sm { background: var(--accent); color: var(--on-accent); font-weight: 700; }
+button.primary { min-height: var(--h-primary); padding: 0 44px; font-size: 18px; align-self: flex-start; }
+button.primary:hover:not(:disabled), button.primary-sm:hover:not(:disabled) { background: var(--accent-hover); }
+button.primary:focus-visible, button.primary-sm:focus-visible { outline-color: var(--text); }
+button.primary:disabled, button.primary-sm:disabled { background: var(--btn-off); color: var(--text-off); }
+button.small { min-height: var(--h-small); padding: 0 14px; font-size: 14px; border-radius: var(--r-input); }
+button.quiet, button.link { background: none; color: var(--text-quiet); font-weight: 400; }
+button.quiet:hover:not(:disabled) { background: var(--raised); color: var(--text); }
+button.link { color: var(--link); min-height: 0; padding: 4px 2px; text-align: left; }
+button.link:hover:not(:disabled) { background: none; text-decoration: underline; text-underline-offset: 3px; }
+button.danger { background: none; border: 1px solid var(--alarm); color: var(--alarm-text); }
+button.danger:hover:not(:disabled) { background: var(--alarm-soft); }
+button.link.danger { border: 0; }
+button.danger:disabled { border-color: var(--border); color: var(--text-off); background: none; }
+button.on { box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+button.icon-btn { width: var(--h-btn); padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+/* Inputs: 44 high, border, 10 radius; the focused field gets the accent ring. */
+select, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) { font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--r-input); min-height: var(--h-btn); padding: 0 12px; }
+textarea { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-input); padding: 10px 12px; }
+input[type="number"] { font-variant-numeric: tabular-nums; }
+select:focus-visible, input:focus-visible, textarea:focus-visible { border-color: var(--accent); outline: 2px solid var(--accent-dim); outline-offset: 0; }
+/* A long camera or task name must never make a drop-down wider than its space (no sideways scrolling). */
+select { max-width: 100%; text-overflow: ellipsis; }
+input[type="checkbox"], input[type="range"], input[type="radio"] { accent-color: var(--accent); }
+/* Toggle switch with its word beside it (On / Off): <input type="checkbox" class="switch">. */
+input.switch { appearance: none; -webkit-appearance: none; flex: none; width: 40px; height: 24px; margin: 0; border-radius: 999px;
+  background: var(--border); position: relative; cursor: pointer; }
+input.switch::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-2); }
+input.switch:checked { background: var(--accent); }
+input.switch:checked::after { left: 19px; background: var(--on-accent); }
+input.switch:disabled { background: var(--surface-2); cursor: default; }
+input.switch:disabled::after { background: var(--scroll-thumb); }
+input.switch:checked:disabled { background: var(--accent-dim); }
+input.switch:checked:disabled::after { background: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { input.switch::after { transition: left 0.15s ease; } }
+.switch-row { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; }
+.switch-row small { font-size: 13px; color: var(--text-2); }
+.switch-row input:checked ~ small { color: var(--link); }
+/* Segmented choice: outline + fill when chosen. */
+.seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.seg > button { min-width: 56px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--r-input); background: none; color: var(--text-quiet); font-weight: 400; font-size: 15px; }
+.seg > button:hover:not(:disabled) { background: var(--raised); }
+.seg > button[aria-pressed="true"], .seg > button[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); font-weight: 600; }
+/* Tabs: a pill track with the chosen one raised (main tabs, Planner views, History periods). */
+.pill-tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--r-input); background: var(--seg-bg); align-self: flex-start; }
+.pill-tabs > button { min-height: 0; padding: 6px 16px; border-radius: var(--r-chip); background: none; color: var(--text-2); font-size: 14px; font-weight: 400; }
+.pill-tabs > button:hover:not(:disabled) { background: none; color: var(--text); }
+.pill-tabs > button[aria-pressed="true"], .pill-tabs > button[aria-checked="true"], .pill-tabs > button[aria-current="page"], .pill-tabs > button.on {
+  background: var(--seg-on); color: var(--text); font-weight: 600; box-shadow: none; }
+/* Status: shape + word, colour third. */
+.status { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.status b { font-weight: 600; }
+.status .sub { color: var(--text-2); }
+.status-pill { background: var(--surface); border-radius: 999px; padding: 8px 14px; }
+.status-pill.warn { background: var(--warn-bg); }
+.status-pill.warn .sub { color: var(--warn-text); }
+.status-pill.alarm { background: var(--alarm-soft); }
+/* Bars under the tab bar: warning (amber), reminder (accent), hint (neutral). 52 high, full width. */
+.note-bar { display: flex; align-items: center; gap: 12px; min-height: 52px; margin: 4px var(--gutter) 0; padding: 6px 8px 6px 16px; border-radius: var(--radius);
+  background: var(--raised); color: var(--text); font-size: 15px; }
+.note-bar .grow-gap { flex: 1; }
+.note-bar.warn { background: var(--warn-bg); border: 1px solid var(--warn-line); }
+.note-bar.remind { background: var(--accent-soft); }
+.note-bar b { font-weight: 600; }
+.countdown-track { width: 160px; height: 6px; border-radius: 3px; background: var(--warn-track); position: relative; overflow: hidden; flex: none; }
+.countdown-track span { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--warn); }
+/* Card */
+.panel-card { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.panel-card .label { font-size: 12px; color: var(--text-2); }
+.panel-card .value { font-size: 15px; font-weight: 600; }
+/* Dialog: 480 wide on a 60% scrim. */
+.dialog-back { position: fixed; inset: 0; z-index: 50; background: var(--scrim); display: grid; place-items: center; padding: 16px; }
+.dialog { width: min(480px, calc(100vw - 32px)); background: var(--raised); border: 1px solid var(--border); border-radius: var(--r-dialog); padding: 24px;
+  display: flex; flex-direction: column; gap: 12px; color: var(--text); }
+.dialog h2, .dialog h3 { margin: 0; font-size: 20px; font-weight: 600; }
+.dialog p { margin: 0; color: var(--text-2); line-height: 1.5; }
+.dialog .actions-end { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+/* Icons drawn as SVG (src/screens/icons.tsx): never colour alone, always with a word or a name. */
+.icon { flex: none; }
+h1, h2, h3 { margin: 0; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* The tab bar stays at the top while the page scrolls (2026-10-21: it scrolled away on tall pages). */
+:root { --tabs-h: 48px; } /* the sticky tab bar's height, for things that stick below it */
+.tabs { display: flex; align-items: center; gap: var(--s1); height: var(--tabs-h); padding-left: 14px;
+  position: sticky; top: 0; z-index: 5; background: var(--bg); }
+/* The window's title bar (2026-10-22, electron/main.ts): the tab bar is where you drag the window; its buttons stay
+   clickable; Windows' minimise / maximise / close sit over its right end, so the bar leaves room for them
+   (env(titlebar-area-width): the width left of those buttons). During setup an empty strip does the same. */
+.tabs { -webkit-app-region: drag; padding-right: calc(100vw - env(titlebar-area-width, 100vw) + var(--s1)); }
+.tabs button, .tabs .help, .tabs .help-menu { -webkit-app-region: no-drag; }
+.drag-strip { position: fixed; top: 0; left: 0; height: env(titlebar-area-height, 40px); width: env(titlebar-area-width, 100%);
+  -webkit-app-region: drag; z-index: 6; }
+.drag-strip ~ main { padding-top: calc(env(titlebar-area-height, 40px) + var(--s2)); }
+/* Scrollbars (2026-10-22): thin and dark like the page, on every scrolling area; still easy to grab (10 px wide,
+   at least 40 px long, brighter when you point at it). */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 5px; border: 2px solid transparent; background-clip: padding-box; min-height: 40px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); background-clip: padding-box; }
+::-webkit-scrollbar-button { display: none; height: 0; width: 0; }
+.tabs .help > button { background: none; color: var(--text-2); font-size: 13px; font-weight: 400; min-height: var(--tabs-h); padding: 0 14px; border-radius: 0; }
+.tabs .help > button:hover:not(:disabled), .tabs .help > button[aria-expanded="true"] { background: none; color: var(--text); }
+.app { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap: var(--s3); padding: var(--s3); }
+.app.single { grid-template-columns: minmax(0, 900px); justify-content: center; }
+.stage .mirror { position: relative; transform: scaleX(-1); border-radius: var(--radius); overflow: hidden; background: #000; }
+.stage video { display: block; width: 100%; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Kept playing (detection reads it) but out of sight when the preview is not shown. */
+.stage.offscreen { position: absolute; left: -10000px; top: 0; width: 640px; }
+/* Debug tab: the camera column keeps its own height and sticks below the tab bar, so you can see yourself while you
+   scroll through the controls on the right (owner, 2026-10-22). */
+.app.sticky-camera .stage { position: sticky; top: calc(var(--tabs-h) + var(--s3)); align-self: start; }
+.note, .muted { color: var(--muted); font-size: 14px; }
+p.muted { margin: 0; }
+.warn { color: var(--alert); }
+
+.debug, .study, .settings, .history, .report { display: flex; flex-direction: column; gap: 14px; }
+.state { font-size: 44px; font-weight: 700; }
+.state-FOCUSED { color: var(--focused); }
+.state-PHONE, .state-PHONE_CALL, .state-DOWN, .state-AWAY, .state-LOOKING_AWAY { color: var(--alert); }
+.state-WRITING, .state-READING, .state-SPEAKING, .state-IDLE { color: var(--focused); }
+.state-BREAK { color: var(--c-break); }
+.state-PAUSED { color: var(--c-away); }
+table { border-collapse: collapse; }
+td { padding: 4px 10px 4px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+td small { color: var(--muted); margin-left: 6px; }
+td.hit { color: var(--alert); font-weight: 600; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.debug details label { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.debug details input { width: 90px; }
+/* Form rows: a label and its control on one line; a checkbox with its words. */
+.field { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.field input[type="number"] { width: 100px; }
+.field input[type="range"] { flex: 1; max-width: 320px; }
+.check { display: flex; gap: var(--s1); align-items: baseline; }
+.check small { color: var(--muted); }
+.self-start { align-self: flex-start; }
+.nowrap { white-space: nowrap; }
+input[type="checkbox"], input[type="range"], input[type="radio"] { accent-color: var(--accent); }
+button.link.danger { border-color: transparent; }
+
+.clips { border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; }
+.advice { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.advice .ok { color: var(--focused); }
+
+/* Study (Night Desk B-Study / Study-Running boards): camera left, ring timer centre, cards right, a dock at the bottom.
+   The Study root uses display: contents so its parts and App's camera (.stage) share one grid on <main>. */
+.study { gap: var(--s3); max-width: 760px; }
+main.app:has(> .study-grid) { grid-template-columns: 260px minmax(0, 1fr) 260px; grid-template-rows: auto 1fr auto;
+  grid-template-areas: "cam center side" "left center side" "dock dock dock"; gap: 10px 24px; padding: 12px var(--gutter) 0;
+  justify-content: stretch; min-height: calc(100vh - var(--tabs-h)); align-items: start; }
+.study-grid { display: contents; }
+main.app:has(> .study-grid) > .stage:not(.offscreen) { grid-area: cam; }
+.stage .note { font-size: 12px; margin: 6px 0 0; color: var(--text-3); }
+.cam-tile { grid-area: cam; height: 120px; width: 100%; background: var(--surface); color: var(--text-2); font-weight: 400; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; }
+.study-left { grid-area: left; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.study-left .status { font-size: 14px; }
+.study-left .place-line { font-size: 13px; color: var(--text-2); }
+.study-left .place-line .link, .study-left > .link { font-size: 13px; padding: 0; }
+.study-center { grid-area: center; display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; }
+.study-side { grid-area: side; display: flex; flex-direction: column; gap: 10px; }
+.study-side .panel-card { text-align: left; align-items: flex-start; }
+.study-side .link { padding: 0; font-size: 13px; }
+.dock { grid-area: dock; position: sticky; bottom: 0; margin-bottom: 24px; min-height: var(--h-dock, 80px); background: var(--surface); border-radius: var(--r-dialog);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 12px 12px 12px 16px; z-index: 2;
+  box-shadow: 0 24px 0 0 var(--bg); } /* the strip under the dock hides what scrolls behind it */
+.dock .grow { flex: 1; }
+.dock-sep { width: 1px; height: 36px; background: var(--border); }
+.dock .seg { flex-wrap: nowrap; }
+.dock .custom-min { width: 84px; text-align: center; }
+button.big { min-height: var(--h-primary); padding: 0 22px; font-size: 16px; display: inline-flex; align-items: center; gap: 8px; }
+button.big.outline { background: none; box-shadow: inset 0 0 0 1px var(--scroll-thumb); }
+button.big.outline:hover:not(:disabled) { background: var(--raised); }
+/* Camera mode / Screen mode: a toggle button drawn as a switch, with its word (On / Off). */
+button.mode { background: none; font-weight: 400; font-size: 14px; padding: 0 4px; display: inline-flex; align-items: center; gap: 10px; }
+button.mode:hover:not(:disabled) { background: none; }
+button.mode small { font-size: 12px; color: var(--text-2); }
+button.mode .track { width: 40px; height: 24px; border-radius: 999px; background: var(--border); position: relative; flex: none; }
+button.mode .track::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-2); }
+button.mode[aria-pressed="true"] .track { background: var(--accent); }
+button.mode[aria-pressed="true"] .track::after { left: 19px; background: var(--on-accent); }
+button.mode[aria-pressed="true"] small { color: var(--link); }
+@media (prefers-reduced-motion: no-preference) { button.mode .track::after { transition: left 0.15s ease; } }
+/* Ring timer (src/screens/Ring.tsx). */
+.ring { position: relative; width: min(400px, 100%, calc(100vh - 330px)); min-width: 260px; aspect-ratio: 1; }
+.study-grid.running .ring, .study-grid.paused .ring, .study-grid.break .ring { width: min(360px, 100%, calc(100vh - 360px)); }
+.ring > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ring-track { fill: none; stroke: var(--surface-2); stroke-width: 10; }
+.ring-done { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; }
+.study-grid.paused .ring-done, .study-grid.break .ring-done { stroke: var(--text-3); }
+.ring-in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 12%; }
+.ring-label { font-size: 14px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.1em; }
+.study-grid.running .ring-label { color: var(--link); }
+.ring-sub { font-size: 14px; color: var(--text-2); margin-top: 10px; }
+.ring .clock { font-size: clamp(56px, 30cqw, 120px); margin-top: 6px; white-space: nowrap; }
+/* Bangla digits sit in 0.77em boxes (ClockText), so the same clock is wider: a smaller size keeps it inside the ring. */
+:lang(bn) .ring .clock { font-size: clamp(44px, 22cqw, 92px); }
+.ring { container-type: inline-size; }
+.ring-task { margin: 0; font-size: 16px; color: var(--text); }
+button.ring-task { background: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; }
+button.ring-task:hover:not(:disabled) { background: var(--raised); }
+.study-panel { width: 100%; max-width: 640px; background: var(--surface); border-radius: var(--radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.study-panel header { display: flex; justify-content: space-between; align-items: center; }
+.study-panel h2 { font-size: 18px; }
+.drowsy-hint { margin: 0; min-height: 44px; padding: 4px 6px 4px 14px; background: var(--raised); color: var(--text-quiet); font-size: 14px; }
+.study-center > .note-bar { margin: 0; }
+.study.check { align-items: center; max-width: none; padding-top: 24px; }
+.check-failed { width: min(520px, 100%); }
+.strict-sentence { color: var(--text) !important; }
+.clock { font-size: clamp(56px, min(13vw, 17vh), 128px); font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.02em; }
+.clock-sm { font-size: 56px; }
+.state-line, .state-word { display: flex; align-items: center; gap: 10px; margin: 0; }
+.state-word { font-size: 28px; font-weight: 600; }
+.study-left .state-word { font-size: 14px; gap: 8px; }
+.mark { flex: none; display: inline-block; width: 14px; height: 14px; }
+.state-word .mark { width: 18px; height: 18px; }
+.mark-circle { border-radius: 50%; background: currentColor; }
+.mark-ring { border-radius: 50%; border: 2px solid currentColor; }
+.mark-square { background: currentColor; }
+.mark-triangle { background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.study.running .state-word { color: var(--accent); }
+.study.break .state-word, .study.paused .state-word { color: var(--muted); }
+.hint { font-size: 13px; font-weight: 400; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.cards { display: flex; flex-wrap: wrap; gap: var(--s1); align-items: stretch; }
+.card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 88px; padding: 12px 16px; text-align: left; }
+.card b { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.card small { color: var(--muted); font-size: 13px; }
+/* Selected: thicker accent border and a tint; mode cards also say On/Off. */
+.card[aria-checked="true"], .card[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 11px 15px; }
+.modes .card { flex: 1 1 240px; }
+/* Small cards for switching a view (Planner, History). */
+.cards.compact .card { min-width: 0; padding: 6px 16px; }
+.cards.compact .card[aria-checked="true"] { padding: 5px 15px; }
+.cards.compact .card b { font-size: 16px; }
+.card-title { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: var(--s1); font-weight: 600; }
+.card-title em { font-style: normal; font-size: 13px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); }
+.card[aria-pressed="true"] .card-title em { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.more { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); }
+.more-panel { border-top: 1px solid var(--line); padding-top: var(--s2); display: flex; flex-direction: column; gap: var(--s2); }
+details.more-panel > summary { cursor: pointer; color: var(--muted); }
+progress { width: 100%; height: 8px; accent-color: var(--accent); }
+.actions { gap: var(--s1); }
+.goal { font-size: 24px; font-weight: 600; color: var(--accent); display: flex; align-items: center; gap: 10px; margin: 0; }
+/* Alarm (Night Desk Alarm boards, src/screens/Alarm.tsx): the whole window, a red frame, the kind of alarm as a word,
+   a symbol, what to do in big letters, and a bar with the clock and the buttons. Red only here. */
+.alarm-screen { position: fixed; inset: 0; z-index: 46; max-width: none; margin: 0; display: flex; flex-direction: column; gap: 0;
+  background: var(--alarm-bg); border: 6px solid var(--alarm); color: var(--text); text-align: center; }
+.alarm-screen .alarm-kind { height: 42px; padding-left: 14px; font-size: 13px !important; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--alarm-text); justify-content: flex-start; -webkit-app-region: drag; }
+.alarm-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 0 var(--s6) 30px; }
+.alarm-icon { width: 120px; height: 120px; border-radius: 50%; background: var(--alarm); color: var(--alarm-bg); display: grid; place-items: center;
+  box-shadow: 0 0 0 14px color-mix(in srgb, var(--alarm) 30%, transparent), 0 0 0 28px color-mix(in srgb, var(--alarm) 14%, transparent); margin-bottom: 18px; }
+.alarm-main h1 { font-size: clamp(36px, 5.5vw, 64px); line-height: 1.08; font-weight: 700; max-width: 18em; }
+.alarm-note { margin: 0; font-size: 16px; color: var(--alarm-text); }
+.alarm-bar { min-height: 64px; border-top: 1px solid color-mix(in srgb, var(--alarm) 30%, transparent); display: flex; flex-wrap: wrap; align-items: center;
+  gap: 10px 14px; padding: 10px 22px; }
+.alarm-bar .grow { flex: 1; }
+.alarm-clock { font-size: 14px; color: var(--alarm-text); }
+.alarm-clock b { color: var(--text); font-variant-numeric: tabular-nums; font-size: 18px; margin-left: 6px; }
+button.on-alarm { background: none; color: var(--text); border: 1px solid color-mix(in srgb, var(--alarm) 50%, transparent); font-weight: 600; }
+button.on-alarm:hover:not(:disabled) { background: var(--alarm-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .alarm-icon { animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.6; } }
+}
+
+/* Reports (DESIGN.md): one sentence, three numbers, the timeline, details on demand. */
+.report { gap: var(--s3); }
+.sentence { font-size: 20px; margin: 0; }
+.numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--s2); }
+.numbers div { display: flex; flex-direction: column; gap: 2px; padding: var(--s2); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.numbers b { font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.numbers small { color: var(--muted); font-size: 14px; }
+.numbers small.breakdown { font-size: 13px; }
+/* Timeline: one labelled row per kind of time; the row says what it was, not the colour alone. */
+.timeline { display: flex; flex-direction: column; gap: 4px; }
+.lane { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: var(--s1); }
+.lane-name { font-size: 13px; color: var(--muted); }
+.lane-track { position: relative; height: 18px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; }
+.lane .block { position: absolute; top: 2px; bottom: 2px; min-width: 2px; border-radius: 2px; }
+.lane-study .block { background: var(--accent); }
+.lane-distracted .block { background: var(--alert); }
+.lane-break .block { background: var(--muted); }
+.lane .block.moment { min-width: 3px; margin-left: -1px; top: -3px; bottom: -3px; }
+.lane .block:hover, .lane .block:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; z-index: 1; }
+.lane-times { display: flex; justify-content: space-between; margin-left: calc(112px + var(--s1)); color: var(--muted); font-size: 12px; }
+.timeline-said { min-height: 1.45em; font-size: 13px; }
+.sessions { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--s3); }
+.sessions li { display: flex; flex-direction: column; gap: var(--s1); }
+.sessions button.link { align-self: flex-start; padding-inline: 0; color: var(--text); }
+
+/* Empty states: what will appear here, and the one thing to do. */
+.empty { display: flex; flex-direction: column; gap: var(--s1); align-items: flex-start; padding: var(--s3) 0; }
+.history.empty { padding-top: var(--s6); }
+
+/* History: bars are buttons (keyboard), today is marked with the word "Today". */
+.history { gap: var(--s3); max-width: 900px; }
+.bars { display: flex; gap: 4px; height: 180px; }
+.bar { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 0; border: none; background: none; border-radius: 0; }
+.bar-track { flex: 1; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.bar-fill { width: 100%; min-height: 1px; background: var(--accent); opacity: 0.7; border-radius: 3px 3px 0 0; }
+.bar:hover .bar-fill, .bar.today .bar-fill { opacity: 1; }
+.bar small { font-size: 12px; color: var(--muted); text-align: center; white-space: nowrap; min-height: 1.4em; }
+.bar.today small { color: var(--text); font-weight: 600; }
+/* Stats per task or subject (Stage G1): numbers right-aligned so they line up. */
+.by-table { margin-top: var(--s4); display: flex; flex-direction: column; gap: var(--s2); }
+.by-table table { width: 100%; }
+.by-table th, .by-table td { padding: 6px 12px; text-align: left; }
+.by-table th:first-child, .by-table td:first-child { padding-left: 0; }
+.by-table th:not(:first-child), .by-table td:not(:first-child) { text-align: right; }
+.by-table th:last-child, .by-table td:last-child { padding-right: 0; }
+button.link.back { align-self: flex-start; padding-inline: 0; }
+
+/* Settings: flat sections separated by lines; Advanced closed until opened. */
+.settings { gap: var(--s3); max-width: 760px; }
+.settings section { display: flex; flex-direction: column; gap: 12px; padding-bottom: var(--s3); border-bottom: 1px solid var(--line); }
+.settings code { word-break: break-all; }
+.settings details.advanced > summary { cursor: pointer; font-weight: 600; padding: var(--s1) 0; }
+.settings details.advanced[open] { display: flex; flex-direction: column; gap: var(--s3); }
+.settings .danger-zone { border-bottom: none; }
+.field-block { display: flex; flex-direction: column; gap: 6px; }
+/* Weekly review: label on the left, one plain sentence on the right. */
+.review { display: grid; grid-template-columns: max-content 1fr; gap: var(--s1) var(--s3); margin: 0; }
+.review dt { color: var(--muted); }
+.review dd { margin: 0; }
+.backups { display: flex; flex-direction: column; gap: var(--s1); margin-top: var(--s1); }
+.backups h4 { margin: 0; font-weight: 600; }
+.backups p { margin: 0; }
+.backup-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.backup-list li { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); padding: 6px 0; border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums; }
+/* Workstation box */
+.grow { flex: 1; min-width: 160px; }
+details.info summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+details.info summary::-webkit-details-marker { display: none; }
+.info-btn { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); color: var(--accent); font-size: 14px; }
+details.info[open] .info-btn { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.info-card { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); font-size: 13px; }
+.info-card p { margin: 0 0 6px; }
+.info-card p:last-child { margin: 0; }
+.ok-note { color: var(--focused); font-weight: 600; }
+button.primary-sm { background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; }
+/* Screen mode */
+.code { font-family: ui-monospace, Consolas, monospace; font-size: 20px; letter-spacing: 2px; }
+.list-group { display: flex; flex-direction: column; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px 2px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; }
+.chip.blocked { border-color: var(--alert); color: var(--alert); }
+.chip.productive { border-color: var(--focused); color: var(--focused); }
+.chip button { border: none; background: none; padding: 0 6px; color: inherit; }
+/* Block lists on the Study tab (Stage D2) */
+.blockpanel { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--panel); display: flex; flex-direction: column; gap: 10px; }
+.blockpanel summary { cursor: pointer; }
+.blockpanel details input { width: auto; }
+.blocklists { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.modal-back { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: grid; place-items: center; z-index: 10; padding: 16px; }
+.modal { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; max-width: 440px; display: flex; flex-direction: column; gap: 10px; }
+.modal p { margin: 0; }
+.cue { font-size: 28px; font-weight: 700; margin: 0; }
+/* Planner (Stage E) */
+.planner { display: flex; flex-direction: column; gap: var(--s3); max-width: 900px; }
+.week-view, .task-form { display: flex; flex-direction: column; gap: 12px; }
+.planner label { display: inline-flex; align-items: center; gap: 6px; }
+input.mins { width: 80px; }
+table.tasks { width: 100%; }
+table.tasks td small { display: block; margin-left: 0; }
+table.tasks tr.done td:first-child { text-decoration: line-through; color: var(--muted); }
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.board .col, .week .col { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; min-height: 120px; display: flex; flex-direction: column; gap: 8px; background: var(--panel); }
+.col h3 { font-size: 14px; color: var(--muted); }
+.task-card { border: 1px solid var(--line); border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 6px; cursor: grab; background: var(--bg); }
+.task-card small { display: block; color: var(--muted); }
+.task-card .row { gap: 4px; }
+/* Board (Stage G2): filter on top, columns, and the list's side panel on the right when a card is open. */
+.board-view { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s2) var(--s3); align-items: start; }
+.board-view.with-panel { grid-template-columns: minmax(0, 1fr) 320px; }
+.board-view .board-filter { grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: var(--s2); width: auto; max-width: 360px; }
+.board-view .board-filter select { width: auto; min-width: 180px; }
+.task-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 6px; padding: 6px 8px; cursor: pointer; }
+.task-card .card-title { grid-column: 1; grid-row: 1; }
+.task-card .card-move { grid-column: 2; grid-row: 1; align-self: start; }
+.task-card .card-meta, .task-card .card-progress { grid-column: 1 / -1; }
+.task-card.open, .task-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.task-card .card-title { font-weight: 600; overflow-wrap: anywhere; }
+.card-progress { display: block; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.card-progress span { display: block; height: 100%; background: var(--accent); }
+.task-card .card-move button { padding: 0 8px; min-height: 0; line-height: 1.6; }
+.block { display: flex; gap: 4px; align-items: flex-start; }
+.block-open { flex: 1; display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; padding: 6px 8px; }
+.block-open small { color: var(--muted); }
+/* Routines (Stage G3): the picker bar, the week with dates, one-day actions, and the editor. */
+.routine-bar { align-items: center; flex-wrap: wrap; gap: var(--s2); }
+.routine-bar .routine-pick { display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: var(--s2); width: auto; }
+.routine-bar .routine-pick select { width: auto; min-width: 200px; }
+.week-nav { align-items: center; gap: var(--s2); }
+.week .col.today { border-color: var(--accent); }
+.block { flex-direction: column; align-items: stretch; }
+.block.skipped .block-open { opacity: 0.55; text-decoration: line-through; }
+.block-day { display: flex; flex-wrap: wrap; gap: 0 12px; font-size: 13px; padding: 0 8px 4px; }
+.block-day .link { padding: 2px 0; min-height: 0; }
+.block-move { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 8px 6px; }
+.block-move input { width: 100%; }
+.routine-editor { display: flex; flex-direction: column; gap: var(--s3); }
+.routine-editor > button { align-self: flex-start; }
+.routine-editor .field { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.slots { width: 100%; border-collapse: collapse; }
+.slots th { text-align: left; font-weight: 600; color: var(--muted); font-size: 13px; }
+.slots td, .slots th { padding: 6px 8px 6px 0; vertical-align: middle; }
+.day-chips { display: inline-flex; gap: 2px; flex-wrap: wrap; }
+.day-chips button { padding: 2px 7px; min-height: 0; border-radius: 12px; font-size: 13px; }
+.day-chips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); }
+.copy-day { align-items: flex-end; flex-wrap: wrap; gap: var(--s2); }
+button.next-line { min-height: 0; font-weight: 400; }
+button.next-line:hover:not(:disabled) { background: var(--raised); }
+.mark-done { background: var(--surface); border-radius: var(--radius); padding: 8px 8px 8px 16px; }
+/* Reminder (accent) and the blocker's warning (amber, a triangle and the words; Stage G4) are .note-bar bars. */
+.reminder, .block-warning { flex-wrap: wrap; }
+.focus .block-warning { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 43; margin: 0; width: min(720px, calc(100vw - 32px)); }
+
+/* First-run setup (E2 Part 3): one step at a time, Next / Back, "Skip setup" always there. */
+.first-run { display: flex; flex-direction: column; gap: var(--s2); max-width: 640px; }
+.first-run h2 { font-size: 28px; }
+.first-run p { margin: 0; }
+.first-run .lead { font-size: 18px; }
+.setup-nav { margin-top: var(--s1); }
+button.link.skip-setup { align-self: flex-start; padding-inline: 0; margin-top: var(--s2); }
+.aim { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--s1); }
+.aim li { display: flex; align-items: baseline; gap: 10px; }
+.aim .mark-circle { color: var(--accent); }
+.aim .mark-triangle { color: var(--alert); }
+ol.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.guide { display: flex; align-items: center; gap: 10px; font-size: 18px; margin: 0; }
+.guide.nofire { color: var(--alert); }
+
+/* Help menu at the right of the tab bar. */
+.tabs .help { margin-left: auto; position: relative; }
+.help-menu { position: absolute; right: 0; top: 100%; z-index: 15; display: flex; flex-direction: column; min-width: 220px; padding: 4px;
+  background: var(--raised); border: 1px solid var(--border); border-radius: var(--radius); }
+.tabs .help-menu button { min-height: 40px; padding: 0 12px; text-align: left; background: none; color: var(--text); font-weight: 400; border-radius: var(--r-chip); }
+.tabs .help-menu button:hover:not(:disabled) { background: var(--accent-soft); }
+.tabs .help-menu button:disabled { background: none; }
+
+/* Spotlight tour: everything dimmed except one real control. */
+.tour { position: fixed; inset: 0; z-index: 30; }
+.tour-hole { position: fixed; border-radius: var(--radius); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); outline: 2px solid var(--accent); pointer-events: none; }
+.tour-card { position: fixed; width: 360px; max-width: calc(100vw - 32px); display: flex; flex-direction: column; gap: var(--s1);
+  padding: var(--s2); background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius); }
+.tour-card p, .tour-card h3 { margin: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .tour-hole { transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease; }
+}
+
+/* To-do list (E4 Part 1): lists | tasks | (task panel). Wider than other screens so the panel fits next to the list. */
+.app.single.wide { grid-template-columns: minmax(0, 1180px); }
+.app.single.wide .planner { max-width: none; }
+.todo { display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.todo.with-panel { grid-template-columns: 228px minmax(0, 1fr) 320px; }
+.todo-lists { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--tabs-h) + var(--s2)); }
+.todo-lists h3 { font-size: 13px; color: var(--muted); margin: var(--s2) 0 4px 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+.list-item { display: grid; grid-template-columns: 1fr auto auto; gap: var(--s1); align-items: baseline; width: 100%; text-align: left;
+  border-color: transparent; background: none; padding: 6px 10px; }
+.list-item small { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.list-item b { font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+.list-item[aria-current="true"] { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+.list-item[aria-current="true"] b { color: var(--text); }
+.subject-item { position: relative; }
+.subject-tools { position: absolute; right: 4px; top: 100%; z-index: 2; display: none; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.subject-item:hover .subject-tools, .subject-item:focus-within .subject-tools { display: flex; }
+.subject-tools button { font-size: 13px; padding: 2px 8px; }
+.add-subject { align-self: flex-start; margin-left: 6px; }
+.name-box { width: 100%; }
+.todo-main { display: flex; flex-direction: column; gap: var(--s2); min-width: 0; }
+.todo-main h2 { font-size: 24px; }
+.stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.stats-row div { padding: 10px 12px; }
+.stats-row div + div { border-left: 1px solid var(--line); }
+.stats-row dt { color: var(--muted); font-size: 13px; }
+.stats-row dd { margin: 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.quick-add { display: flex; flex-direction: column; gap: var(--s1); }
+.quick-input { width: 100%; padding: 10px 14px; }
+.quick-extras { min-height: 24px; gap: var(--s1); }
+.quick-chip { background: var(--accent-soft); border-color: var(--accent); }
+.pomo-picker { display: inline-flex; align-items: center; gap: 4px; }
+.pomo-picker button { width: 16px; height: 16px; padding: 0; border-radius: 50%; border: 1.5px solid var(--muted); background: none; }
+.pomo-picker button.on { background: var(--accent); border-color: var(--accent); }
+.pomo-picker small { color: var(--muted); margin-left: 4px; }
+.task-rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.task-row { display: flex; align-items: center; gap: 12px; padding: 8px 6px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.task-row:hover { background: var(--surface); }
+.task-row.selected { background: var(--accent-soft); }
+.task-row:focus-visible { outline-offset: -2px; }
+.task-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.task-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-row.done .task-title { text-decoration: line-through; color: var(--muted); }
+.task-meta { color: var(--muted); font-size: 13px; display: flex; gap: 8px; }
+.overdue { font-weight: 600; color: var(--text); }
+.pomos { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+.task-row .move { display: inline-flex; gap: 2px; opacity: 0; }
+.task-row:hover .move, .task-row:focus-within .move, .task-row:focus .move { opacity: 1; }
+.task-row .move button, .task-row .start { padding: 2px 10px; font-size: 13px; }
+/* Round checkbox; ticking fills it and draws the tick (no animation with reduced motion). */
+.tick { flex: none; width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 2px solid var(--muted); background: none; position: relative; }
+.tick[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.tick[aria-checked="true"]::after { content: ''; position: absolute; left: 6px; top: 2px; width: 5px; height: 10px;
+  border: solid var(--on-accent); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .task-row.ticking .tick { animation: tick-pop 0.3s ease-out; }
+  .task-row.ticking .task-title { transition: color 0.3s; color: var(--muted); }
+}
+@keyframes tick-pop { 0% { transform: scale(0.8); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.keys { font-size: 13px; }
+.task-panel { display: flex; flex-direction: column; gap: 14px; padding: var(--s2); border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); position: sticky; top: calc(var(--tabs-h) + var(--s2)); max-height: calc(100vh - 120px); overflow-y: auto; }
+.task-panel .row { align-items: flex-end; }
+.task-panel .row > .field-block { flex: 1; min-width: 120px; }
+.panel-head { flex-wrap: nowrap; align-items: center !important; }
+.panel-title { flex: 1; min-width: 0; font-size: 18px; font-weight: 600; border-color: transparent; padding: 4px 6px; }
+.panel-title:hover, .panel-title:focus { border-color: var(--line); }
+.task-panel textarea { font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 7px 10px; resize: vertical; }
+.subtasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.subtasks li { align-items: center; }
+.subtasks span { flex: 1; }
+.subtasks .done, .search .done { text-decoration: line-through; color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: var(--s3); transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: var(--s2);
+  padding: 10px 12px 10px 16px; background: var(--text); color: var(--bg); border-radius: var(--radius); max-width: calc(100vw - 32px); }
+.toast button { background: none; color: inherit; border-color: currentColor; padding: 4px 12px; }
+.search-backdrop { position: fixed; inset: 0; z-index: 25; background: rgba(0, 0, 0, 0.45); display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh; }
+.search { width: 520px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s2); display: flex; flex-direction: column; gap: var(--s1); }
+.search input { width: 100%; padding: 10px 14px; }
+.search ul { list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow-y: auto; }
+.search li button { width: 100%; text-align: left; border-color: transparent; display: flex; justify-content: space-between; gap: var(--s1); }
+.search li button:hover, .search li button:focus-visible { background: var(--accent-soft); }
+.search small { color: var(--muted); }
+.task-panel label.field-block, .task-panel .field-block { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.task-panel input:not([type="checkbox"]), .task-panel select, .task-panel textarea { width: 100%; }
+.task-panel .panel-title { width: auto; }
+.quick-extras .estimate-label { color: var(--muted); font-size: 13px; }
+
+/* Focus mode (E4 Part 2): the one screen with its own background (black by default; dark grey, deep green, deep blue).
+   Always the dark palette, whatever the app theme. Red still only for alarms. */
+.start-row { gap: var(--s2); }
+.focus { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--focus-bg); color: var(--text); }
+.focus button { color: inherit; }
+.focus-top { display: flex; justify-content: flex-end; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); }
+.focus-hint { color: var(--muted); font-size: 14px; }
+.focus-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s2); text-align: center; padding: 0 var(--s3); }
+.focus-task { margin: 0; font-size: clamp(18px, 2.4vw, 26px); display: flex; flex-direction: column; align-items: center; gap: 2px; max-width: 80vw; }
+.focus-task small { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.focus-state { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 18px; color: var(--muted); }
+.focus-state .mark-circle { color: var(--accent); }
+.focus-mode-name { font-size: 13px; border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.focus-clock { font-size: clamp(96px, min(22vw, 30vh), 260px); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -0.02em; }
+.focus-note { color: var(--muted); margin: 0; font-size: 15px; }
+.focus-dots { display: flex; align-items: center; gap: 8px; margin: 0; }
+.focus-dots span { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--muted); }
+.focus-dots span.on { background: var(--accent); border-color: var(--accent); }
+.focus-dots small { color: var(--muted); margin-left: 6px; font-size: 14px; }
+.focus-actions { display: flex; gap: var(--s2); align-items: center; margin-top: var(--s2); }
+button.focus-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600; font-size: 18px; padding: 12px 32px; }
+button.focus-quiet { display: inline-flex; align-items: center; gap: 6px; background: none; border-color: transparent; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+button.focus-quiet:hover:not(:disabled) { color: var(--text); border-color: transparent; }
+.danger-text { color: #ff9a8f !important; }
+.focus-bar { display: flex; justify-content: center; gap: var(--s1); padding: var(--s2); }
+.focus-bar button { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; min-width: 96px; background: none; border-color: transparent; color: var(--muted); font-size: 13px; }
+.focus-bar button:hover, .focus-bar button[aria-expanded="true"] { color: var(--text); border-color: var(--line); }
+.focus-pop { position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%); z-index: 41; width: min(520px, calc(100vw - 32px));
+  display: flex; flex-direction: column; gap: 12px; padding: var(--s2); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.focus-cards { display: flex; flex-wrap: wrap; gap: 4px; }
+.focus-cards button { display: inline-flex; align-items: center; gap: 8px; background: none; border: 1px solid var(--border); border-radius: var(--r-input);
+  color: var(--text-quiet); font-weight: 400; padding: 0 14px; }
+.focus-cards button:hover:not(:disabled) { background: var(--raised); }
+.focus-cards button[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); font-weight: 600; }
+/* "Set your timer" before a task's first start (Timer-Dialog board, without the run preview). */
+.timer-dialog { width: min(520px, calc(100vw - 32px)); padding: 32px; gap: 22px; border-radius: 20px; background: var(--surface); text-align: left; }
+.timer-dialog h2.focus-state { font-size: 28px; color: var(--text); }
+.timer-dialog .focus-ready { width: auto; margin: 0; }
+.timer-dialog .timer-fields { grid-template-columns: 1fr; gap: 14px; }
+.timer-dialog .focus-field { font-size: 16px; }
+.timer-dialog .focus-field input[type="number"] { width: 88px; text-align: center; font-size: 20px; font-weight: 600; background: var(--bg); }
+.timer-dialog .actions-end { margin-top: 0; }
+.timer-dialog button.focus-quiet { text-decoration: none; min-height: 52px; padding: 0 20px; color: var(--text-quiet); }
+.timer-dialog button.focus-primary { min-height: 52px; padding: 0 36px; font-size: 17px; font-weight: 700; }
+.swatch { width: 16px; height: 16px; border-radius: 3px; border: 1px solid #6b7069; }
+.focus-field { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); }
+.focus-field input[type="number"] { width: 90px; background: #000; }
+.focus-field input[type="range"] { flex: 1; }
+.timer-settings { display: flex; flex-direction: column; gap: 12px; }
+.timer-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px var(--s3); }
+.focus-ready { width: min(520px, calc(100vw - 32px)); margin: var(--s3) 0; text-align: left; }
+.focus-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 42; width: min(380px, 90vw); padding: var(--s3); background: var(--surface);
+  border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s2); transform: translateX(100%); visibility: hidden; }
+.focus-drawer.open { transform: none; visibility: visible; }
+@media (prefers-reduced-motion: no-preference) { .focus-drawer { transition: transform 0.25s ease, visibility 0.25s; } }
+.focus-drawer h2 { font-size: 20px; }
+.focus-drawer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; overflow-y: auto; }
+.focus-drawer li { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-bottom: 1px solid var(--line); }
+.focus-drawer li span { flex: 1; display: flex; flex-direction: column; }
+.focus-drawer li small { color: var(--muted); font-size: 13px; }
+.focus-drawer li.current { background: var(--accent-soft); }
+.focus-drawer em { font-style: normal; color: var(--accent); font-weight: 600; font-size: 14px; }
+.focus-dialog-back { position: fixed; inset: 0; z-index: 45; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; }
+.focus-dialog { width: min(520px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 12px; padding: var(--s3); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.focus-dialog h2 { font-size: 22px; }
+.focus-dialog input { width: 100%; background: #000; }
+
+/* Mini timer window (its own small always-on-top window). The grip drags the window. */
+.mini { height: 100vh; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 0; background: #000; color: #e8e9e3; overflow: hidden; }
+.mini.alarm { background: #c8372c; color: #fff; }
+.mini-grip { align-self: stretch; width: 10px; margin: 12px 0 12px 8px; -webkit-app-region: drag; cursor: grab; border-inline: 2px dotted #6b7069; }
+.mini-time { flex: 1; display: flex; flex-direction: column; align-items: flex-start; background: none; border: none; padding: 4px 6px; color: inherit; text-align: left; line-height: 1.1; }
+.mini-time b { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mini-time small { font-size: 12px; color: #a2a59b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+.mini.alarm .mini-time small { color: #fff; }
+.mini-toggle { width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #1b1e1b; border-color: #3a3f39; color: inherit; }
+body:has(.focus) { overflow: hidden; } /* no page scrollbar behind Focus mode */
+.focus-dialog .row { flex-wrap: nowrap; gap: var(--s1); }
+.focus-dialog button.focus-primary { font-size: 16px; padding: 10px 20px; }
+
+.stats-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+/* Day view (E4 Part 3): hours | Scheduled | Done. Blocks are tinted, tasks outlined, sessions filled (and buttons). */
+.day-plan { display: flex; flex-direction: column; gap: var(--s2); }
+.day-nav h3 { margin-left: var(--s1); font-size: 18px; }
+.day-nav button:not(.link) { padding: 6px 12px; }
+.day-grid { display: grid; grid-template-columns: 52px minmax(0, 1fr) minmax(0, 1fr); gap: var(--s2); align-items: end; }
+.day-hours { position: relative; }
+.day-hours span { position: absolute; right: 0; transform: translateY(-50%); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.day-col h3 { font-size: 14px; color: var(--muted); margin-bottom: var(--s1); }
+.day-lane { position: relative; border-left: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.hour-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--line); }
+.day-empty { position: absolute; top: var(--s2); left: var(--s2); right: var(--s2); }
+.day-item { position: absolute; left: 6px; right: 6px; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+  padding: 2px 8px; border-radius: var(--radius); text-align: left; font-size: 14px; line-height: 1.25; }
+.day-item small { font-size: 12px; opacity: 0.85; }
+.day-item.block { background: var(--accent-soft); border: 1px solid var(--accent); }
+.day-item.task { left: 40%; background: var(--surface); border: 1px dashed var(--muted); z-index: 1; }
+.day-item.session { background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); }
+.day-item.session.on { outline: 2px solid var(--text); outline-offset: 1px; }
+.day-report { border-top: 1px solid var(--line); padding-top: var(--s2); display: flex; flex-direction: column; gap: var(--s1); }
+.day-grid { max-height: calc(100vh - 290px); min-height: 320px; overflow-y: auto; padding-top: 8px; }
+.day-col h3 { position: sticky; top: -8px; z-index: 2; background: var(--bg); padding: 4px 0; margin: 0; }
+/* Bangla clock digits in equal boxes (src/screens/ClockText.tsx). */
+.dg { display: inline-block; width: 0.77em; text-align: center; }
+
+/* ---- Night Desk group 2: Focus mode (B-Focus board), mini timer (Mini-Timer board). Later rules win over the E4 ones above. ---- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.focus-top { position: absolute; top: 0; right: 0; padding: 16px 24px; z-index: 2; }
+.focus button.focus-exit { text-decoration: none; min-height: 36px; font-size: 14px; }
+.focus-center { gap: 20px; padding-bottom: 96px; }
+.focus .ring.focus-ring { width: min(470px, calc(100vh - 250px), 90vw); min-width: 300px; }
+.focus-ring .ring-track { stroke: var(--surface); stroke-width: 4; }
+.focus-ring .ring-done { stroke-width: 4; }
+.focus-ring.brk .ring-done { stroke: var(--text-3); }
+.focus-ring .ring-in { gap: 6px; }
+.focus-ring .focus-task { font-size: 18px; color: var(--text-2); max-width: 100%; }
+.focus-ring .focus-task small { font-size: 12px; }
+.focus-ring .focus-state { font-size: 14px; color: var(--text-2); }
+.focus-ring .focus-clock { font-size: clamp(64px, 34cqw, 160px); font-weight: 500; letter-spacing: -0.03em; white-space: nowrap; }
+:lang(bn) .focus-ring .focus-clock { font-size: clamp(52px, 25cqw, 120px); }
+.focus-ring .focus-note { font-size: 14px; }
+.focus-dots span { width: 22px; height: 5px; border-radius: 3px; border: 0; background: var(--btn); }
+.focus-dots span.on { background: var(--accent); }
+.focus-dots small { font-size: 14px; color: var(--text-2); }
+.focus button.focus-primary { min-height: var(--h-primary); padding: 0 32px; border-radius: var(--radius); font-size: 17px; font-weight: 700; }
+.focus button.focus-quiet { text-decoration: none; color: var(--text-quiet); font-weight: 400; min-height: var(--h-btn); padding: 0 16px; }
+.focus button.focus-quiet:hover:not(:disabled) { background: var(--raised); color: var(--text); }
+.focus button.round { width: 64px; height: 64px; min-height: 64px; padding: 0; border-radius: 50%; justify-content: center; background: var(--surface); color: var(--text); }
+.focus button.round:hover:not(:disabled) { background: var(--btn-hover); }
+.focus-hint { position: absolute; right: 32px; bottom: 32px; font-size: 13px; color: var(--text-3); }
+.focus-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); gap: 4px; padding: 4px; background: var(--raised);
+  border: 1px solid var(--surface-2); border-radius: 14px; }
+.focus-bar button { flex-direction: row; min-width: 0; min-height: var(--h-btn); padding: 0 16px; border: 0; border-radius: var(--r-input); font-size: 14px; font-weight: 400; color: var(--text-quiet); gap: 8px; }
+.focus-bar button:hover, .focus-bar button[aria-expanded="true"] { background: var(--btn); color: var(--text); }
+.focus-pop { bottom: 84px; background: var(--raised); border-color: var(--border); border-radius: var(--r-dialog); padding: 20px; }
+.focus-field input[type="number"], .focus-dialog input { background: var(--bg); }
+.focus-dialog-back { background: var(--scrim); z-index: 47; }
+.focus-dialog { background: var(--raised); border-color: var(--border); border-radius: var(--r-dialog); padding: 24px; }
+.focus-dialog .row { justify-content: flex-end; }
+.focus-dialog .danger-text { color: var(--alarm-text) !important; }
+.focus-center > .dialog { width: min(520px, calc(100vw - 32px)); text-align: left; }
+.mini { background: #0D0E11; color: var(--text); gap: 10px; }
+.mini.alarm { background: var(--alarm-bg); color: var(--text); box-shadow: inset 0 0 0 3px var(--alarm); }
+.mini-grip { border-inline-color: var(--border); }
+.mini-time b { font-size: 34px; font-weight: 500; letter-spacing: -0.02em; }
+.mini-time small { color: var(--text-2); }
+.mini.alarm .mini-time small { color: var(--alarm-text); }
+.mini-toggle { min-height: 0; border-radius: 9px; background: var(--surface-2); color: var(--text); margin-right: 4px; }
+.note-bar.warn { color: var(--text); } /* not the old red .warn text: amber is the warning colour, red only for alarms */
+.focus-dialog .row { flex-wrap: wrap; }
+.focus-dialog .row button { white-space: nowrap; }
+.focus .focus-dialog button.focus-primary { padding: 0 22px; font-size: 16px; }
+.study.alarm-screen { z-index: 20; } /* under Focus mode (40), which shows its own alarm */
+.focus.alarm-screen { z-index: 46; background: var(--alarm-bg); }
+
+/* ---- Night Desk group 3: Planner (Planner-List / Board / Week / Day boards, Routine-Editor). ---- */
+/* View switches everywhere (Planner views, History periods, Settings choices): a pill track. */
+.cards.compact { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: var(--r-input); background: var(--seg-bg); align-self: flex-start; }
+.cards.compact .card, .cards.compact .card[aria-checked="true"] { min-height: 0; min-width: 0; padding: 6px 16px; border: 0; border-radius: var(--r-chip);
+  background: none; color: var(--text-2); font-weight: 400; font-size: 14px; }
+.cards.compact .card b { font-size: 14px; font-weight: inherit; }
+.cards.compact .card:hover:not(:disabled) { background: none; color: var(--text); }
+.cards.compact .card[aria-checked="true"] { background: var(--seg-on); color: var(--text); font-weight: 600; }
+/* Small round controls keep their own size (not the 44 px button). */
+button.tick, .pomo-picker button, .task-row .move button, .task-card .card-move button { min-height: 0; }
+.tick { border-color: var(--scroll-thumb-hover); }
+.tick[aria-checked="true"] { background: var(--scroll-thumb); border-color: var(--scroll-thumb); }
+.planner { gap: var(--s2); }
+.app.single.wide { grid-template-columns: minmax(0, 1224px); padding-top: 10px; }
+/* List */
+.list-item { padding: 8px 10px; border: 0; border-radius: var(--r-chip); background: none; color: var(--text-quiet); font-weight: 400; min-height: 0; }
+.list-item:hover:not(:disabled) { background: var(--raised); }
+.list-item[aria-current="true"] { background: var(--raised); color: var(--text); font-weight: 600; border: 0; }
+.todo-lists h3 { font-size: 12px; color: var(--text-3); letter-spacing: 0.08em; }
+.stats-row { border: 0; background: var(--surface); border-radius: var(--radius); }
+.stats-row div + div { border-left-color: var(--surface-2); }
+.stats-row dt { font-size: 12px; color: var(--text-2); }
+.stats-row dd { font-size: 20px; }
+.task-rows { border-top: 0; display: flex; flex-direction: column; gap: 8px; }
+.task-row { border: 1px solid transparent; border-bottom: 1px solid transparent; border-radius: var(--radius); background: var(--surface); padding: 10px 12px; }
+.task-row:hover { background: var(--raised); }
+.task-row.selected { background: var(--raised); border-color: var(--accent); }
+.task-row .start { min-height: 36px; border-radius: var(--r-input); }
+.task-panel { background: var(--raised); border-radius: var(--radius); }
+/* Board */
+.board .col, .week .col { border: 0; background: var(--surface); padding: 10px; }
+.week .col.today { box-shadow: inset 0 0 0 1px var(--accent); }
+.col h3 { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; margin: 2px 4px 4px; }
+.task-card { border: 0; border-radius: var(--r-input); background: var(--raised); padding: 10px 12px; }
+.task-card:hover { background: var(--btn); }
+.card-progress { background: var(--surface-2); }
+/* Week and routines */
+.block-open { min-height: 0; background: var(--raised); border-radius: var(--r-input); font-weight: 400; }
+.block-open:hover:not(:disabled) { background: var(--btn); }
+.block-day .link { font-size: 13px; }
+.routine-editor { background: var(--surface); border-radius: var(--r-dialog); padding: 20px 24px; }
+
+/* ---- Owner's fixes, 2026-10-23 ---- */
+/* Circles stay circles: fixed size, never stretched by flex or the button minimum. */
+button.tick { width: 22px; height: 22px; min-width: 22px; min-height: 0; padding: 0; aspect-ratio: 1; flex: none; align-self: center; }
+.pomo-picker button { width: 16px; height: 16px; min-width: 16px; min-height: 0; padding: 0; aspect-ratio: 1; flex: none; }
+/* Segmented choices: text centred, every segment the same height, the chosen one the same size. */
+.cards.compact .card, .cards.compact .card[aria-checked="true"] { display: inline-flex; flex-direction: row; align-items: center; justify-content: center;
+  height: 34px; line-height: 1; gap: 6px; box-sizing: border-box; }
+/* Focus mode: Exit at the top left (Windows' buttons are hidden in full screen, and nothing sits under them anyway). */
+.focus-top { left: 0; right: auto; }
+.focus-drawer { padding-top: max(var(--s3), env(titlebar-area-height, 0px)); }
+/* Focus ring: sized to the window so the ring, Pause/Stop and the tool bar all fit (1280 × 730 and smaller). */
+.focus .ring.focus-ring { width: min(440px, calc(100vh - 290px), 90vw); min-width: 240px; }
+.focus-center { padding-bottom: 88px; gap: 16px; }
+.focus-ring .ring-track { stroke: rgba(255, 255, 255, 0.16); } /* shows on every Focus background */
+.focus-ring .ring-in { padding: 0 16%; }
+/* Pomodoro row inside the ring, under the clock: the dashes, then the words on one line. */
+.focus-dots { flex-direction: column; gap: 8px; max-width: 100%; }
+.focus-dots .dashes { display: flex; gap: 5px; max-width: 100%; }
+.focus-dots .dashes span { flex: 0 1 22px; min-width: 6px; height: 5px; }
+.focus-dots small { margin-left: 0; white-space: nowrap; font-size: 13px; }
+/* Going over an estimate: amber (red is only for alarms). */
+.card-progress.over span { background: var(--warn); }
+.pomos.over { color: var(--warn); }
+/* Scrollbars: thin, rounded, a nearly invisible track, a soft thumb that follows the theme, stronger on hover. */
+:root, .focus { --scroll-thumb: #4A4F5B; --scroll-thumb-hover: #6E7482; }
+:root[data-theme="light"] { --scroll-thumb: #B9BEC9; --scroll-thumb-hover: #8E94A1; }
+@media (prefers-color-scheme: light) { :root:not([data-theme]) { --scroll-thumb: #B9BEC9; --scroll-thumb-hover: #8E94A1; } }
+::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 6px; background-clip: padding-box; }
+.focus-dots .dashes span { width: 22px; flex: 0 1 auto; }
+.focus-dots span.dashes { width: auto; height: auto; background: none; border-radius: 0; border: 0; }

@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Desk Watch blocker",
+  "version": "1.0.0",
+  "description": "Tells the Desk Watch app on this computer which site is open, so it can block distracting sites during study sessions. Talks only to this computer.",
+  "permissions": ["tabs", "storage", "alarms"],
+  "host_permissions": ["http://127.0.0.1:47615/*"],
+  "background": { "service_worker": "background.js" },
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "action": { "default_title": "Desk Watch blocker (click for options)" }
+}

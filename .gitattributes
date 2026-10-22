@@ -1,0 +1,15 @@
+# Line endings: LF in the repository AND in the working folder, on every computer.
+# Without this, Windows Git (core.autocrlf=true) wrote CRLF on disk, and some tools showed files as
+# "modified" when only the line endings differed.
+* text=auto eol=lf
+
+# Binary files: never changed by Git.
+*.ttf binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.tflite binary
+*.task binary
+*.wasm binary
+*.db binary
+*.webm binary

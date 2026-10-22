@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desk Watch blocker</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #f6f6f4; --panel: #fff; --text: #1b1b1b; --muted: #6b6b6b; --line: #e2e2de; --accent: #1f9d55; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #141414; --panel: #1e1e1e; --text: #ececec; --muted: #9a9a9a; --line: #2e2e2e; --accent: #3ccf7a; } }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, 'Segoe UI', sans-serif; padding: 24px 16px; }
+    main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    input, button { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+    input { font-family: ui-monospace, Consolas, monospace; letter-spacing: 2px; text-transform: uppercase; width: 100%; box-sizing: border-box; }
+    button { cursor: pointer; }
+    button.primary { background: var(--accent); color: #fff; border: none; font-weight: 600; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .note { color: var(--muted); font-size: 14px; }
+    details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; }
+    summary { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Desk Watch blocker</h1>
+    <p id="status">…</p>
+    <div class="row">
+      <button class="primary" id="connect">Connect to Desk Watch</button>
+      <button id="test">Test connection</button>
+    </div>
+    <p class="note">Desk Watch must be open. It asks "Connect?" in its window: click Allow.</p>
+    <details>
+      <summary>Use a pairing code instead</summary>
+      <p class="note">Only if the Allow question does not appear. The code is in Desk Watch → Settings → Blocker mode.</p>
+      <input id="code" maxlength="8" autocomplete="off" spellcheck="false">
+      <div class="row" style="margin-top:8px"><button id="save">Save code</button></div>
+    </details>
+    <p class="note">This extension sends the address of your active tab only to the Desk Watch app on this computer
+      (127.0.0.1), and only to decide whether to block it during a study session. Nothing goes to the internet.</p>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
