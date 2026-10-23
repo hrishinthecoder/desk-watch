@@ -1,6 +1,7 @@
 # Desk Watch
 
-> **Beta (0.1.1-beta): still being tested.** Windows 10/11 only. Please report problems on the Issues page.
+
+> **Beta (0.1.1-beta): still being tested.** Windows 10/11 only. Tried it? [Tell me how it went (3 questions, 1 minute)](https://forms.gle/HahLMNuUL9vcB3sU9) or report problems on the [Issues page](https://github.com/hrishinthecoder/desk-watch/issues).
 
 A study-focus app. It watches your webcam while you study and rings an alarm when you pick up your phone, leave your
 desk, look away, or fall asleep. It also times your sessions, plans your tasks, and can block distracting sites and apps.
@@ -36,6 +37,10 @@ English and বাংলা. Free and open source (MIT).
 - The phone model was trained on one person, in one room, at night, wearing glasses. It may miss your phone.
 - Glasses can hide closed eyes. A phone lying flat on the desk can be counted as sleepy.
 - No Firefox support for blocking. Mac and Linux are not supported.
+
+## Feedback
+
+Used Desk Watch for a session? [Answer 3 quick questions](https://forms.gle/HahLMNuUL9vcB3sU9). It takes a minute, needs no account, and tells me what to fix first. Found a bug? Open an [issue](https://github.com/hrishinthecoder/desk-watch/issues).
 
 ## Build from source
 
