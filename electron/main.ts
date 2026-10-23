@@ -3,6 +3,7 @@ import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { basename, dirname, join, normalize } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { DatabaseSync } from 'node:sqlite';
+import { execFile } from 'node:child_process';
 import * as store from './db.js';
 import { normalizeApp, normalizeSite, onlyAddsBlocked, type Entry } from './blocklist.js';
 import { createScreen } from './screen.js';
@@ -208,7 +209,7 @@ ipcMain.handle('session:start', (_e, o: { startedAt: number; plannedMin: number;
   activeSession = store.startSession(db, { startedAt: num(o.startedAt), plannedMin: num(o.plannedMin), cameraMode: !!o.cameraMode, screenMode: !!o.screenMode,
     taskId: o.taskId === null || o.taskId === undefined ? null : num(o.taskId) });
   screenMode = !!o.screenMode;
-  screen?.setState({ sessionId: activeSession, screenMode, blocking: screenMode });
+  screen?.setState({ sessionId: activeSession, screenMode, blocking: screenMode, quiet: quietSites() });
   keepAwake ??= powerSaveBlocker.start('prevent-display-sleep'); // keeps the PC and screen awake during sessions
   tray?.setToolTip(tr('Desk Watch: session running'));
   return activeSession;
@@ -224,7 +225,7 @@ ipcMain.handle('session:event', (_e, id: number, type: string, at: number) => {
 });
 ipcMain.handle('session:finish', (_e, id: number, at: number, early: boolean) => {
   store.finishSession(db, num(id), num(at), !!early);
-  if (id === activeSession) { activeSession = null; screenMode = false; screen?.setState({ sessionId: null, screenMode: false, blocking: false }); }
+  if (id === activeSession) { activeSession = null; screenMode = false; screen?.setState({ sessionId: null, screenMode: false, blocking: false, quiet: false }); }
   if (keepAwake !== null) { powerSaveBlocker.stop(keepAwake); keepAwake = null; }
   tray?.setToolTip('Desk Watch');
 });
@@ -242,14 +243,24 @@ function askPair(name: string) {
 ipcMain.on('screen:pair-answer', (_e, allow: boolean) => { pairAnswer?.(allow === true); pairAnswer = null; });
 ipcMain.handle('screen:remove-browser', (_e, origin: string) => screen?.removeBrowser(String(origin)));
 
+// Website notifications are blocked during a running session (Settings → Sessions); read when a session starts or resumes.
+const quietSites = () => store.getSettings(db).quietSites !== false;
 // Blocking pauses during a break or a pause, and comes back when you resume.
 ipcMain.on('screen:blocking', (_e, on: boolean) => {
-  if (activeSession !== null) screen?.setState({ sessionId: activeSession, screenMode, blocking: screenMode && !!on });
+  if (activeSession !== null) screen?.setState({ sessionId: activeSession, screenMode, blocking: screenMode && !!on, quiet: quietSites() && !!on });
 });
 ipcMain.handle('screen:info', () => screen?.info() ?? null);
 ipcMain.handle('screen:new-code', () => screen?.newCode() ?? null);
 // The extension's folder: next to the installed app (resources/extension), or in the source folder.
 ipcMain.handle('screen:open-extension-folder', () => shell.openPath(app.isPackaged ? join(process.resourcesPath, 'extension') : join(app.getAppPath(), 'extension')));
+// Windows notifications (owner, 2026-10-23): an app cannot switch Do not disturb on by itself, so the page shows a
+// bar that opens the setting. Not needed when every app's notifications are already off (ToastEnabled = 0; read only).
+ipcMain.handle('windows:toasts-off', () => new Promise<boolean>((resolve) => {
+  if (process.platform !== 'win32') return resolve(true);
+  execFile('reg', ['query', 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications', '/v', 'ToastEnabled'],
+    { windowsHide: true, timeout: 3000 }, (err, out) => resolve(!err && /ToastEnabled\s+REG_DWORD\s+0x0\b/.test(out)));
+}));
+ipcMain.handle('windows:open-dnd', () => shell.openExternal('ms-settings:notifications'));
 ipcMain.handle('blocklist:get', () => store.getBlocklist(db));
 // Entries come from the page: each one is checked and cleaned before it is stored.
 ipcMain.handle('blocklist:set', (_e, entries: unknown) => {

@@ -2,6 +2,8 @@
 // (127.0.0.1 only) when it changes and every 30 s. If the app answers "block", the tab is sent
 // to the "Back to work" page. Nothing is sent anywhere else; only the connection key and the
 // last connection status are stored.
+// Website notifications: while Desk Watch says "quiet" (a running session), every site's notifications are blocked
+// with Chrome's own site setting; they come back when the session ends, pauses, or Desk Watch cannot be reached.
 const APP = 'http://127.0.0.1:47615';
 
 const browserName = () => {
@@ -12,6 +14,15 @@ const browserName = () => {
   return 'Chrome';
 };
 const setStatus = (status) => chrome.storage.local.set({ status });
+
+// Sets or clears only this extension's own block, so your own per-site choices come back untouched.
+async function setQuiet(quiet) {
+  const { quiet: was } = await chrome.storage.local.get('quiet');
+  if (!!was === quiet) return;
+  if (quiet) await chrome.contentSettings.notifications.set({ primaryPattern: '<all_urls>', setting: 'block' });
+  else await chrome.contentSettings.notifications.clear({});
+  await chrome.storage.local.set({ quiet });
+}
 
 // Asks Desk Watch to connect; you click Allow there. `manual`: you pressed Connect in the options.
 async function pair(manual = false) {
@@ -51,23 +62,27 @@ async function report(tab) {
     if (r.status === 403) {
       // Disconnected in Desk Watch (or the code changed): stop until you click Connect.
       await chrome.storage.local.set({ key: '', declined: true });
+      await setQuiet(false);
       return setStatus('Disconnected from Desk Watch. Click Connect to connect again.');
     }
-    if (!r.ok) return setStatus(`Desk Watch answered with an error (${r.status}).`);
+    if (!r.ok) { await setQuiet(false); return setStatus(`Desk Watch answered with an error (${r.status}).`); }
     const res = await r.json();
     await chrome.storage.local.set({ status: 'Connected to Desk Watch.', seen: Date.now() });
+    await setQuiet(res.quiet === true);
     if (res.block) {
       const site = new URL(tab.url).hostname.replace(/^www\./, '');
       await chrome.tabs.update(tab.id, { url: chrome.runtime.getURL('blocked.html') + '?site=' + encodeURIComponent(site) });
     }
   } catch {
+    await setQuiet(false);
     await setStatus('Desk Watch is not running (or not reachable on this computer).');
   }
 }
 
 const activeTab = async (query) => (await chrome.tabs.query({ active: true, ...query }))[0];
 
-chrome.runtime.onInstalled.addListener(() => pair());
+// A fresh install or update starts with notifications as you set them.
+chrome.runtime.onInstalled.addListener(async () => { await chrome.contentSettings.notifications.clear({}); await chrome.storage.local.set({ quiet: false }); pair(); });
 chrome.runtime.onStartup.addListener(() => pair());
 chrome.tabs.onActivated.addListener(async ({ tabId }) => report(await chrome.tabs.get(tabId)));
 chrome.tabs.onUpdated.addListener((_id, info, tab) => { if (info.url) report(tab); });

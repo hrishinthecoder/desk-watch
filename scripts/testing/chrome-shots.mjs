@@ -41,7 +41,7 @@ for (const lang of ['en', 'bn']) {
   await shot(`${lang}-focus-fullscreen`);
   await p.ev(`[...document.querySelectorAll('.focus button')].find((b) => /Stop|থামান|শেষ/.test(b.textContent))?.click(); return 1`);
   await sleep(500);
-  await p.ev(`[...document.querySelectorAll('.focus-dialog button')].find((b) => /End session|সেশন শেষ/.test(b.textContent))?.click(); return 1`);
+  await p.ev(`[...document.querySelectorAll('.focus-dialog button')].find((b) => /End session|Session শেষ/.test(b.textContent))?.click(); return 1`);
   await sleep(800);
   await p.ev(`document.querySelector('.focus-exit')?.click(); return 1`);
   await sleep(800);

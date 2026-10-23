@@ -41,4 +41,11 @@ export type Background = 'black' | 'grey' | 'green' | 'blue';
 export const BACKGROUNDS: [Background, string, string][] = [
   ['black', tk('Black'), '#000000'], ['grey', tk('Dark grey'), '#1f201f'], ['green', tk('Deep green'), '#0e2a20'], ['blue', tk('Deep blue'), '#0e1b30'],
 ];
-export const backgroundColor = (b: string) => (BACKGROUNDS.find(([k]) => k === b) ?? BACKGROUNDS[0])[2];
+// The light theme (owner, 2026-10-23): the same four choices in light colours, so Focus mode follows the theme.
+export const LIGHT_BACKGROUNDS: [Background, string, string][] = [
+  ['black', tk('Warm white'), '#FBFAF7'], ['grey', tk('Light grey'), '#EFF0ED'], ['green', tk('Pale green'), '#E9F3EC'], ['blue', tk('Pale blue'), '#EAF0F8'],
+];
+export const backgrounds = (light: boolean) => (light ? LIGHT_BACKGROUNDS : BACKGROUNDS);
+export const backgroundColor = (b: string, light = false) => (backgrounds(light).find(([k]) => k === b) ?? backgrounds(light)[0])[2];
+// Whether the page shows the light theme: chosen in Settings, or "system" and Windows is light.
+export const isLight = (theme: string, systemLight: boolean) => theme === 'light' || (theme === 'system' && systemLight);

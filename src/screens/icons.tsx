@@ -20,6 +20,8 @@ const P = {
   clock: <><circle cx="12" cy="13" r="8" /><path d="M12 9v4l3 2" /></>,
   moon: <path d="M19 15.5A8 8 0 0 1 8.5 5a8 8 0 1 0 10.5 10.5z" />,
   cup: <><path d="M4 12a8 8 0 0 0 16 0" /><path d="M12 3v5" /></>,
+  bell: <><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z" /><path d="M10 21a2 2 0 0 0 4 0" /></>,
+  lock: <><rect x="4.5" y="10.5" width="15" height="10" rx="2" /><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" /></>,
   camera: <><rect x="3" y="6" width="13" height="12" rx="2.5" /><path d="M16 10l5-3v10l-5-3" /></>,
   // Alarm symbols (Alarm-Phone / Alarm-Variants boards)
   phone: <><rect x="7" y="2" width="10" height="20" rx="2.5" /><path d="M10.5 18.5h3" /></>,

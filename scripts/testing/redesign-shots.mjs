@@ -189,6 +189,78 @@ if (group === 'final') {
   await p.settings({ theme: 'dark', language: 'en' });
 }
 
+if (group === 'history') {
+  const period = (i) => p.ev(`document.querySelectorAll('.history > .cards .card')[${i}].click(); return 1`).then(() => sleep(800));
+  for (const [theme, language] of [['dark', 'en'], ['light', 'en'], ['dark', 'bn']]) {
+    const tag = `${theme}-${language}`;
+    await p.settings({ theme, language, alarmVolume: 0 });
+    await p.ev(`document.querySelectorAll('nav.tabs .pill-tabs > button')[2].click(); return 1`); await sleep(900);
+    await period(2); await snap(`${tag}-7days`);
+    if (tag !== 'dark-en') continue;
+    await period(1); await snap(`${tag}-week`);
+    await period(4); await snap(`${tag}-alltime`);
+    await period(2);
+    await p.ev(`const b = [...document.querySelectorAll('.bars .bar')]; b[b.length - 2]?.click(); return 1`); await sleep(900);
+    await snap(`${tag}-day`);
+    await p.ev(`[...document.querySelectorAll('.history button')].find((b) => /focused/.test(b.textContent))?.click(); return 1`); await sleep(900);
+    await snap(`${tag}-report`);
+  }
+  await p.settings({ theme: 'dark', language: 'en' });
+}
+
+if (group === 'settings') {
+  const go = (i) => p.ev(`document.querySelectorAll('.settings-nav button')[${i}].click(); return 1`).then(() => sleep(700));
+  for (const [theme, language] of [['dark', 'en'], ['light', 'en'], ['dark', 'bn']]) {
+    const tag = `${theme}-${language}`;
+    await p.settings({ theme, language, alarmVolume: 0 });
+    await p.ev(`document.querySelectorAll('nav.tabs .pill-tabs > button')[3].click(); return 1`); await sleep(900);
+    await snap(`${tag}-top`);
+    if (tag !== 'dark-en') continue;
+    await go(3); await snap(`${tag}-pomodoro`);
+    await go(4); await snap(`${tag}-data`);
+    await go(5); await snap(`${tag}-advanced`);
+  }
+  await p.settings({ theme: 'dark', language: 'en' });
+}
+
+if (group === 'setup') {
+  // Needs a FRESH test copy without seed.mjs (a new user sees setup). The camera area stays hidden in every shot.
+  const next = () => p.ev(`document.querySelector('.setup-nav button.primary')?.click(); return 1`).then(() => sleep(1500));
+  for (const theme of ['dark', 'light']) {
+    await p.settings({ theme, language: 'en', alarmVolume: 0, setupDone: false, setupStep: 'welcome' });
+    await snap(`${theme}-welcome`);
+    if (theme === 'light') break;
+    await p.ev(`document.querySelector('.lang-cards .card[lang="bn"]').click(); return 1`); await sleep(900); await snap('bn-welcome');
+    await p.ev(`document.querySelector('.lang-cards .card[lang="en"]').click(); return 1`); await sleep(900);
+    for (const step of ['camera', 'aim', 'calibrate', 'browser', 'practice']) { await next(); await sleep(1500); await snap(`dark-${step}`); }
+  }
+  await p.ev(`document.querySelector('.skip-setup')?.click(); return 1`); await sleep(800);
+  await p.settings({ theme: 'dark', language: 'en' });
+}
+
+if (group === 'light') {
+  const tabN = (i) => p.ev(`document.querySelectorAll('nav.tabs .pill-tabs > button')[${i}].click(); return 1`).then(() => sleep(900));
+  const viewN = (i) => p.ev(`document.querySelectorAll('[data-tour="planner-views"] .card')[${i}].click(); return 1`).then(() => sleep(900));
+  await p.settings({ theme: 'light', language: 'en', alarmVolume: 0, strictMode: false });
+  await p.ev('window.confirm = () => true; return 1');
+  await tabN(0); await snap('study-ready');
+  await p.click('Task:', '.study-center button'); await snap('study-task-panel'); await p.click('', '.study-panel header button');
+  await p.ev(`const b = document.querySelectorAll('button.mode')[0]; if (b.getAttribute('aria-pressed') === 'true') b.click(); return 1`); await sleep(300);
+  await p.click('Start', '.dock button.start'); await sleep(3000); await snap('study-running');
+  await p.click('Pause', '.dock button'); await snap('study-paused'); await p.click('Resume', '.dock button');
+  await p.click('End session', '.dock button'); await sleep(1500); await snap('study-done');
+  await p.ev(`if (document.querySelector('.study.done')) document.querySelector('.study.done button.primary').click(); return 1`); await sleep(600);
+  await tabN(1); await viewN(0); await p.ev(`document.querySelector('.task-row')?.click(); return 1`); await sleep(800); await snap('planner-list');
+  await viewN(1); await snap('planner-board');
+  await viewN(2); await snap('planner-week');
+  await p.click('Edit routine', 'button'); await sleep(800); await snap('planner-routine-editor'); await p.click('Cancel', 'button');
+  await viewN(3); await snap('planner-day');
+  await noFullScreen();
+  await viewN(0); await p.click('Start', '.task-row .start'); await sleep(1200); await snap('focus-timer-dialog');
+  await p.click('Cancel', '.timer-dialog button'); await fullScreenBack();
+  await p.settings({ theme: 'dark' });
+}
+
 if (group === 'planner') {
   const view = (name) => p.click(name, '[aria-label="View"] button');
   for (const language of ['en', 'bn']) {
@@ -206,6 +278,39 @@ if (group === 'planner') {
     await view('Day'); await snap('day');
   }
   await p.settings({ language: 'en' });
+}
+
+// Light Focus mode (owner, 2026-10-23): every light background, the panels, the exit dialog, the Away alarm, Bangla.
+if (group === 'lightfocus') {
+  const mode = (name, on) => p.ev(`const b = [...document.querySelectorAll('button.mode')].find((x) => x.textContent.includes(${JSON.stringify(name)})); if ((b.getAttribute('aria-pressed') === 'true') !== ${on}) b.click(); return 1`);
+  const fresh = () => p.ev(`if (document.querySelector('.study.done')) document.querySelector('.study.done button.primary').click(); return 1`).then(() => sleep(600));
+  const stopFocus = async () => {
+    await p.ev(`[...document.querySelectorAll('.focus button')].find((b) => /Stop|থামান/.test(b.textContent))?.click(); return 1`); await sleep(600);
+    await p.ev(`[...document.querySelectorAll('.focus-dialog button')].find((b) => /End session|Session শেষ/.test(b.textContent))?.click(); return 1`); await sleep(1200);
+    await p.ev(`document.querySelector('.focus-exit')?.click(); return 1`); await sleep(600);
+  };
+  await p.settings({ theme: 'light', language: 'en', alarmVolume: 0, strictMode: false, focusBg: 'black' });
+  await p.ev('window.confirm = () => true; return 1');
+  await noFullScreen();
+  await tab('Study'); await fresh(); await mode('Camera mode', false); await mode('Blocker mode', false);
+  await p.click('Focus mode', '.dock button'); await sleep(3500);
+  for (const name of ['Warm white', 'Light grey', 'Pale green', 'Pale blue']) {
+    await p.click('Background', '.focus-bar button'); await p.click(name, '.focus-pop button');
+    await snap(`bg-${name.toLowerCase().replace(' ', '-')}`); await p.click('Background', '.focus-bar button');
+  }
+  await p.click('Background', '.focus-bar button'); await p.click('Warm white', '.focus-pop button'); await snap('background-panel'); await p.click('Background', '.focus-bar button');
+  await p.click('Pause', '.focus .focus-primary'); await snap('paused'); await p.click('Resume', '.focus .focus-primary');
+  await p.click("Today's tasks", '.focus-bar button'); await sleep(600); await snap('tasks-drawer'); await p.click("Today's tasks", '.focus-bar button'); await sleep(500);
+  await p.click('Exit', '.focus-exit'); await snap('exit-dialog'); await p.click('Keep going', '.focus-dialog button'); await sleep(800);
+  await main(`(() => { require('electron').BrowserWindow.getAllWindows().find((x) => x.getTitle() === 'Desk Watch').webContents.send('mini:action', 'open'); return 1; })()`); await sleep(1500);
+  await stopFocus();
+  await p.settings({ language: 'bn' }); await fresh(); await mode('Camera mode', false);
+  await p.click('Focus mode', '.dock button'); await sleep(3500); await snap('bn-running'); await stopFocus();
+  await p.settings({ language: 'en' }); await tab('Study'); await fresh(); await mode('Camera mode', true);
+  await p.click('Focus mode', '.dock button'); await sleep(4500);
+  await p.click('Start anyway', '.focus button'); await sleep(2500); await snap('alarm-away');
+  await stopFocus();
+  await fullScreenBack(); await p.settings({ theme: 'dark' });
 }
 p.close();
 console.log('done');

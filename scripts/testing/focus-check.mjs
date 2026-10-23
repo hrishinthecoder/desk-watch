@@ -93,8 +93,8 @@ await main(`(() => { const w = require('electron').BrowserWindow.getAllWindows()
 
 // Background (solid colours only)
 await p.click('Background', '.focus-bar button');
-await p.click('Deep green', '.focus-pop button');
-ok('Background: Deep green is used', (await p.ev(`return getComputedStyle(document.querySelector('.focus')).backgroundColor`)) === 'rgb(14, 42, 32)', await p.ev(`return getComputedStyle(document.querySelector('.focus')).backgroundColor`));
+await p.click('Pale green', '.focus-pop button'); // the light theme: Focus mode uses the light backgrounds
+ok('Background: Pale green is used (light theme)', (await p.ev(`return getComputedStyle(document.querySelector('.focus')).backgroundColor`)) === 'rgb(233, 243, 236)', await p.ev(`return getComputedStyle(document.querySelector('.focus')).backgroundColor`));
 await shot(p, join(out, 'focus-background.png'));
 await p.click('Background', '.focus-bar button');
 

@@ -442,3 +442,8 @@ Delete the routine “{name}”? Its blocks go too (also from past days’ plan)
    before: রুটিন “{name}” মুছে ফেলবেন? এর ব্লকগুলোও যাবে (আগের দিনগুলোর পরিকল্পনা থেকেও); সেশন ও পরিসংখ্যান থাকবে।
    after:  রুটিন “{name}” মুছে ফেলবেন? এর ব্লকগুলোও যাবে (আগের দিনগুলোর পরিকল্পনা থেকেও); Session ও পরিসংখ্যান থাকবে।
 ```
+
+## Third pass (2026-10-23): notification block
+
+New lines written with these terms in Latin from the start: notification, browser extension, Do not disturb (the
+name of the Windows setting), Windows, Chrome, Edge, Session, Break. bangla-check allows exactly these.

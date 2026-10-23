@@ -1,6 +1,6 @@
 # Desk Watch
 
-> **Beta (0.1.0-beta): still being tested.** Windows 10/11 only. Please report problems on the Issues page.
+> **Beta (0.1.1-beta): still being tested.** Windows 10/11 only. Please report problems on the Issues page.
 
 A study-focus app. It watches your webcam while you study and rings an alarm when you pick up your phone, leave your
 desk, look away, or fall asleep. It also times your sessions, plans your tasks, and can block distracting sites and apps.
@@ -13,7 +13,7 @@ English and বাংলা. Free and open source (MIT).
 
 ## Install
 
-1. Download `Desk-Watch-Setup-0.1.0-beta.exe` from [Releases](../../releases).
+1. Download `Desk-Watch-Setup-0.1.1-beta.exe` from [Releases](../../releases).
 2. Windows SmartScreen warns you (the installer is not code-signed): click **More info** → **Run anyway**.
 3. Follow the short setup: camera, aim check, 30-second calibration.
 
@@ -25,6 +25,8 @@ English and বাংলা. Free and open source (MIT).
 - **Planner:** to-do list, Board, weekly routines, day view, reminders.
 - **Reports:** one plain sentence per session, History by day, task and subject.
 - **Blocker mode** (Chrome and Edge, with the included extension): blocks sites and apps during a session.
+- **Quiet sessions:** website notifications in Chrome and Edge are blocked while a session runs, and a reminder opens
+  Windows' Do not disturb.
 - **Your data:** export, weekly backups, restore, delete everything.
 
 ![Focus mode](docs/screenshots/focus.png)

@@ -7,7 +7,7 @@
   src: url('/fonts/AnekBangla-Variable.ttf') format('truetype');
   font-weight: 100 800; font-stretch: 75% 125%; font-display: block;
 }
-:root, .focus { /* Focus mode stays dark for now (its backgrounds are dark); light Focus comes with the light-theme group */
+:root { /* Focus mode follows the theme too (owner, 2026-10-23); its own backgrounds are in src/state/focus.ts */
   /* Dark */
   --focus-bg: #000000; --bg: #101114; --surface: #16181C; --surface-2: #1F2228; --raised: #1A1C21; --border: #2A2E37;
   --text: #ECEDF1; --text-2: #A6AAB5; --text-3: #8B909C; --text-quiet: #C3C6CF; --text-off: #6E7380;
@@ -272,7 +272,7 @@ button.ring-task:hover:not(:disabled) { background: var(--raised); }
 .study-panel { width: 100%; max-width: 640px; background: var(--surface); border-radius: var(--radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
 .study-panel header { display: flex; justify-content: space-between; align-items: center; }
 .study-panel h2 { font-size: 18px; }
-.drowsy-hint { margin: 0; min-height: 44px; padding: 4px 6px 4px 14px; background: var(--raised); color: var(--text-quiet); font-size: 14px; }
+.drowsy-hint, .dnd-hint { margin: 0; min-height: 44px; padding: 4px 6px 4px 14px; background: var(--raised); color: var(--text-quiet); font-size: 14px; }
 .study-center > .note-bar { margin: 0; }
 .study.check { align-items: center; max-width: none; padding-top: 24px; }
 .check-failed { width: min(520px, 100%); }
@@ -818,7 +818,7 @@ button.tick { width: 22px; height: 22px; min-width: 22px; min-height: 0; padding
 /* Focus ring: sized to the window so the ring, Pause/Stop and the tool bar all fit (1280 × 730 and smaller). */
 .focus .ring.focus-ring { width: min(440px, calc(100vh - 290px), 90vw); min-width: 240px; }
 .focus-center { padding-bottom: 88px; gap: 16px; }
-.focus-ring .ring-track { stroke: rgba(255, 255, 255, 0.16); } /* shows on every Focus background */
+.focus-ring .ring-track { stroke: color-mix(in srgb, var(--text) 16%, transparent); } /* shows on every Focus background, dark or light */
 .focus-ring .ring-in { padding: 0 16%; }
 /* Pomodoro row inside the ring, under the clock: the dashes, then the words on one line. */
 .focus-dots { flex-direction: column; gap: 8px; max-width: 100%; }
@@ -829,10 +829,119 @@ button.tick { width: 22px; height: 22px; min-width: 22px; min-height: 0; padding
 .card-progress.over span { background: var(--warn); }
 .pomos.over { color: var(--warn); }
 /* Scrollbars: thin, rounded, a nearly invisible track, a soft thumb that follows the theme, stronger on hover. */
-:root, .focus { --scroll-thumb: #4A4F5B; --scroll-thumb-hover: #6E7482; }
+:root { --scroll-thumb: #4A4F5B; --scroll-thumb-hover: #6E7482; }
 :root[data-theme="light"] { --scroll-thumb: #B9BEC9; --scroll-thumb-hover: #8E94A1; }
 @media (prefers-color-scheme: light) { :root:not([data-theme]) { --scroll-thumb: #B9BEC9; --scroll-thumb-hover: #8E94A1; } }
 ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
 ::-webkit-scrollbar-thumb { border: 2px solid transparent; border-radius: 6px; background-clip: padding-box; }
 .focus-dots .dashes span { width: 22px; flex: 0 1 auto; }
 .focus-dots span.dashes { width: auto; height: auto; background: none; border-radius: 0; border: 0; }
+
+/* ---- Night Desk group 4: History + session report (History / Session-Report boards). ---- */
+.history { max-width: 1224px; gap: 16px; }
+.history-grid { display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 20px; align-items: start; }
+.history-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@media (max-width: 1100px) { .history-grid { grid-template-columns: minmax(0, 1fr); } }
+.numbers { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.numbers div { border: 0; border-radius: var(--r-dialog); padding: 16px 18px; }
+.numbers b { font-size: 30px; }
+.numbers small { font-size: 13px; color: var(--text-2); }
+.chart-card { background: var(--surface); border-radius: var(--r-dialog); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.chart-card h3 { font-size: 15px; }
+.chart-card > p.muted { font-size: 13px; }
+.bars { height: 200px; gap: 10px; }
+.bar { min-height: 0; }
+.bar:hover:not(:disabled) { background: none; }
+.bar-track { border-bottom-color: var(--border); }
+.bar-fill { background: var(--accent-dim); opacity: 1; border-radius: 8px 8px 0 0; }
+.bar:hover .bar-fill { background: var(--accent-hover); }
+.bar.today .bar-fill { background: var(--accent); }
+.by-table { margin-top: 0; background: var(--surface); border-radius: var(--r-dialog); padding: 16px 18px; gap: 10px; }
+.by-table header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.by-table h3 { font-size: 15px; }
+.by-table .cards.compact { background: var(--bg); }
+.by-table table { font-size: 14px; font-variant-numeric: tabular-nums; }
+.by-table th { font-size: 12px; font-weight: 400; color: var(--text-3); }
+.by-table td { border-bottom: 0; border-top: 1px solid var(--surface-2); padding-top: 10px; padding-bottom: 10px; }
+.review.chart-card { display: grid; }
+.report { max-width: 1040px; gap: 18px; }
+.report > h2 { font-size: 14px; font-weight: 400; color: var(--text-2); }
+.sentence { font-size: 26px; font-weight: 600; line-height: 1.35; }
+.lane-track { background: var(--bg); border: 0; border-radius: 4px; }
+.lane .block { top: 0; bottom: 0; border-radius: 4px; }
+.lane-break .block { background: var(--scroll-thumb-hover); }
+.lane-name { color: var(--text-quiet); }
+.sessions li { background: var(--surface); border-radius: var(--radius); padding: 12px 16px; }
+.mark-done { background: var(--accent-soft); border-radius: 14px; padding: 10px 10px 10px 18px; }
+.app.single.wide .history { max-width: none; }
+
+/* ---- Night Desk group 5: Settings (Settings board): a section list on the left, each section a card. ---- */
+.settings-page { display: grid; grid-template-columns: 200px minmax(0, 760px); gap: 28px; align-items: start; justify-content: center; }
+.settings-nav { position: sticky; top: calc(var(--tabs-h) + 12px); display: flex; flex-direction: column; gap: 2px; }
+.settings-nav button { justify-content: flex-start; text-align: left; min-height: 0; padding: 8px 12px; border-radius: var(--r-chip);
+  background: none; color: var(--text-quiet); font-weight: 400; font-size: 14px; }
+.settings-nav button:hover:not(:disabled) { background: var(--raised); color: var(--text); }
+.settings { gap: 16px; max-width: none; }
+.settings > section, .settings > details { background: var(--surface); border-radius: var(--r-dialog); padding: 20px 24px; border: 0;
+  display: flex; flex-direction: column; gap: 12px; scroll-margin-top: calc(var(--tabs-h) + 12px); }
+.settings > section > h3 { font-size: 18px; }
+.settings > details > summary { font-size: 18px; font-weight: 600; cursor: pointer; }
+.settings > details > section { border: 0; padding: 12px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.settings > details > section + section { border-top: 1px solid var(--surface-2); }
+.settings .danger-zone { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--alarm) 35%, transparent); }
+.settings .cards:not(.compact) .card { background: var(--raised); border: 1px solid var(--border); border-radius: var(--radius); min-height: 0; }
+.settings .cards:not(.compact) .card[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.settings .field { min-height: 44px; }
+.settings hr { display: none; }
+@media (max-width: 1000px) { .settings-page { grid-template-columns: minmax(0, 1fr); } .settings-nav { display: none; } }
+.warn { color: var(--warn-text); } /* problems and notices are amber; red is only for alarms (DESIGN.md) */
+
+/* ---- Night Desk group 6: first-run setup (Setup boards). ---- */
+.first-run { gap: 18px; max-width: 560px; }
+.first-run h2 { font-size: 34px; line-height: 1.2; }
+.first-run .lead { font-size: 16px; color: var(--text-2); line-height: 1.5; }
+.setup-progress { display: flex; align-items: center; gap: 14px; }
+.setup-progress p { font-size: 13px; }
+.setup-dashes { display: flex; gap: 4px; }
+.setup-dashes span { width: 28px; height: 4px; border-radius: 2px; background: var(--surface-2); }
+.setup-dashes span.on { background: var(--accent); }
+.setup-nav { margin-top: 8px; gap: 12px; }
+.setup-nav .grow { flex: 1; }
+button.quiet.skip-setup { margin: 0; }
+.aim li { align-items: center; font-size: 16px; }
+.aim .mark-triangle, .guide.nofire { color: var(--warn); }
+/* Welcome: one centred column with the emblem, two large language cards and the privacy line in a card. */
+.app.single:has(> .first-run.step-welcome) { grid-template-columns: minmax(0, 620px); }
+.first-run.step-welcome { align-items: center; text-align: center; max-width: 620px; margin: 0 auto; gap: 22px; padding-top: 12px; }
+.first-run.step-welcome h2 { font-size: 44px; }
+.first-run.step-welcome .setup-nav { justify-content: center; }
+.first-run.step-welcome .setup-nav .grow { display: none; }
+.lang-cards { display: grid; grid-template-columns: repeat(2, 240px); gap: 14px; }
+.lang-cards .card { height: 88px; justify-content: center; align-items: flex-start; padding: 0 20px; border: 1px solid var(--border); border-radius: var(--r-dialog);
+  background: var(--surface); }
+.lang-cards .card b { font-size: 24px; }
+.lang-cards .card[aria-checked="true"] { border: 2px solid var(--accent); background: var(--accent-soft); padding: 0 19px; }
+.privacy-card { display: flex; align-items: flex-start; gap: 10px; text-align: left; background: var(--surface); border-radius: var(--radius); padding: 14px 16px;
+  color: var(--text-quiet); line-height: 1.5; }
+.privacy-card .icon { color: var(--link); flex: none; margin-top: 2px; }
+/* Steps with the camera: the picture on the left (App's .stage) in a card, the step on the right. */
+main.app:has(> .first-run) { grid-template-columns: minmax(0, 620px) minmax(0, 1fr); gap: 48px; padding: 24px 64px; align-items: center; }
+main.app:has(> .first-run) > .stage .mirror { border-radius: var(--r-dialog); }
+.first-run .setup-nav { flex-wrap: nowrap; }
+.first-run .setup-nav button.primary { padding: 0 28px; white-space: nowrap; }
+.first-run .setup-nav button.quiet { padding: 0 12px; white-space: nowrap; }
+.first-run .mark-circle { color: var(--accent); }
+
+/* ---- Night Desk group 7: light theme polish. ---- */
+.ring-track { stroke: var(--border); } /* the empty part of the ring shows on the light background too */
+
+/* Light Focus mode (owner, 2026-10-23): Focus follows the theme. Its light backgrounds are a little darker than the
+   page, so its quietest text is one step darker (at least 5.3:1 on all four). */
+:root[data-theme="light"] .focus { --text-3: #5C6270; }
+@media (prefers-color-scheme: light) { :root:not([data-theme]) .focus { --text-3: #5C6270; } }
+/* Pomodoro dashes still to do: a see-through shade of the text, so they show on every background, dark or light. */
+.focus .focus-dots .dashes span:not(.on) { background: color-mix(in srgb, var(--text) 16%, transparent); }
+/* Round Pause / Stop: a thin outline, so they show on the lightest backgrounds too. */
+.focus button.round { box-shadow: inset 0 0 0 1px var(--border); }
+/* Windows' Do not disturb bar (owner, 2026-10-23): its buttons stay on one line. */
+.dnd-hint button { white-space: nowrap; flex: none; }

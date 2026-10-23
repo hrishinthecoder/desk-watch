@@ -6,8 +6,8 @@ import { Icon, alarmIcon } from './icons';
 
 // The full-window alarm (Night Desk Alarm boards), on the Study tab and in Focus mode: a red frame, the kind of alarm
 // as a word, a symbol, what to do in big letters, and a bar with the clock and the buttons. It stops by itself.
-export function AlarmScreen({ alarm, className, clockLabel, clock, children }: {
-  alarm: string; className: string; clockLabel: string; clock: ReactNode; children: ReactNode;
+export function AlarmScreen({ alarm, className, clockLabel, clock, children, note }: {
+  alarm: string; className: string; clockLabel: string; clock: ReactNode; children: ReactNode; note?: string; // note: the setup practice's guide line
 }) {
   return (
     <div className={`${className} alarm-screen`} role="alert" aria-live="assertive">
@@ -15,7 +15,7 @@ export function AlarmScreen({ alarm, className, clockLabel, clock, children }: {
       <div className="alarm-main">
         <span className="alarm-icon"><Icon name={alarmIcon(alarm)} size={44} /></span>
         <h1>{alarmAdvice(alarm)}</h1>
-        <p className="alarm-note">{t('The alarm stops by itself when you are back.')}</p>
+        <p className="alarm-note">{note ?? t('The alarm stops by itself when you are back.')}</p>
       </div>
       <div className="alarm-bar">
         <span className="alarm-clock">{clockLabel} <b>{clock}</b></span>

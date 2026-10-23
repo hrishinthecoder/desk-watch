@@ -2,7 +2,7 @@
 
 The short version is the [README](../README.md).
 
-> **Beta: still being tested.** Version 0.1.0-beta. Expect some rough edges; please report problems on the Issues page.
+> **Beta: still being tested.** Version 0.1.1-beta. Expect some rough edges; please report problems on the Issues page.
 
 A study-focus app for Windows. It watches your webcam while you study and rings an alarm when you pick up your
 phone, leave your desk or look away for too long. It also times your study sessions, plans your tasks and routines,
@@ -25,13 +25,13 @@ English and বাংলা (Bangla). Free and open source (MIT).
 
 Dark theme: [Study screen](screenshots/dark-study.png). The screenshots use made-up data.
 
-> Status: beta (0.1.0-beta). Windows only for now.
+> Status: beta (0.1.1-beta). Windows only for now.
 
 ---
 
 ## Download and install
 
-1. Download `Desk-Watch-Setup-0.1.0-beta.exe` from the [Releases](https://github.com/hrishinthecoder/desk-watch/releases) page.
+1. Download `Desk-Watch-Setup-0.1.1-beta.exe` from the [Releases](https://github.com/hrishinthecoder/desk-watch/releases) page.
 2. Open it. **Windows SmartScreen will warn you** ("Windows protected your PC"), because the installer is not
    code-signed (signing costs money every year, and this is a free project). To continue:
    1. click **More info**;
@@ -181,6 +181,15 @@ During a session the lists are locked: you can only **add** blocked sites and ap
 Removing one or switching sets waits until the session ends.
 Nothing is blocked during a break, during a pause, or outside sessions. Full guide:
 [docs/EXTENSION_INSTALL.md](EXTENSION_INSTALL.md).
+
+**Notifications during a session** (Settings → Sessions, both on by default):
+- **Block website notifications:** while a session runs, the extension blocks pop-up notifications from every site in
+  Chrome and Edge (WhatsApp Web, Gmail, YouTube…). They come back as you had them when the session ends, during a break
+  or a pause, and when Desk Watch is closed. It works without Blocker mode, but needs the extension (version 1.1 or
+  newer: after updating Desk Watch, click the reload button on the extension in `chrome://extensions`).
+- **Remind me to turn on Do not disturb:** Windows does not let apps switch its notifications off, so at the start of a
+  session a bar offers **Open Windows setting** (Do not disturb is there; or press Win + N). The bar does not show
+  when all Windows notifications are already switched off.
 
 ## Known limits
 

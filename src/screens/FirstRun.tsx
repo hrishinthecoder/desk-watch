@@ -5,7 +5,7 @@ import { bridge } from '../bridge';
 import { ClockText } from './ClockText';
 import type { Live } from '../detection/engine';
 import type { Session } from '../session/useSession';
-import { ACTIVITY_TEXT, activityText, alarmText, hms, reportSentence, STUDY, summarize } from '../session/accounting';
+import { ACTIVITY_TEXT, activityText, hms, reportSentence, STUDY, summarize } from '../session/accounting';
 import type { Settings } from '../state/config';
 import {
   aimCheck, GUIDE_TEXT, nextStep, practiceGuide, prevStep, PRIVACY_SENTENCE, SETUP_STEPS, type AimFrame, type Guide, type SetupStep,
@@ -14,6 +14,8 @@ import { Calibrate } from './Calibrate';
 import { ThreeNumbers, Timeline } from './Report';
 import { useExtensionInfo } from './ScreenMode';
 import { Mark } from './Study';
+import { Icon } from './icons';
+import { AlarmScreen } from './Alarm';
 import { LANGS, t, tk } from '../../electron/i18n';
 
 type Props = {
@@ -39,19 +41,29 @@ export function FirstRun(p: Props) {
     p.session.newSession();
     finish(false);
   };
+  const k = SETUP_STEPS.indexOf(step);
   return (
-    <div className="first-run">
-      <p className="muted">{t('Step {k} of {all}', { k: SETUP_STEPS.indexOf(step) + 1, all: SETUP_STEPS.length })}</p>
+    <div className={`first-run step-${step}`}>
+      {/* Where you are (Setup boards): the words and a row of short bars, one per step. */}
+      <div className="setup-progress">
+        <p className="muted">{t('Step {k} of {all}', { k: k + 1, all: SETUP_STEPS.length })}</p>
+        <span className="setup-dashes" aria-hidden="true">{SETUP_STEPS.map((s, i) => <span key={s} className={i <= k ? 'on' : ''} />)}</span>
+      </div>
+      {step === 'welcome' && <svg className="setup-emblem" width="88" height="88" viewBox="0 0 88 88" aria-hidden="true">
+        <circle cx="44" cy="44" r="40" fill="none" stroke="var(--surface-2)" strokeWidth="6" />
+        <circle cx="44" cy="44" r="40" fill="none" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round" strokeDasharray="190 252" transform="rotate(-90 44 44)" />
+        <circle cx="44" cy="44" r="10" fill="var(--accent)" />
+      </svg>}
       <h2>{t(TITLES[step])}</h2>
       {step === 'welcome' && <>
         {/* The language comes first, so someone who reads Bangla can read the rest. */}
-        <div className="cards compact" role="radiogroup" aria-label={t('Language')}>
+        <div className="cards lang-cards" role="radiogroup" aria-label={t('Language')}>
           {LANGS.map(([k, name]) => (
             <button key={k} role="radio" lang={k} aria-checked={(p.settings.language === 'bn' ? 'bn' : 'en') === k} className="card" onClick={() => p.setSettings({ ...p.settings, language: k })}><b>{name}</b></button>
           ))}
         </div>
         <p className="lead">{t('Desk Watch watches your study sessions through the camera and rings an alarm when you pick up your phone, leave or look away.')}</p>
-        <p>{t(PRIVACY_SENTENCE)}</p>
+        <p className="privacy-card"><Icon name="lock" size={18} />{t(PRIVACY_SENTENCE)}</p>
       </>}
       {step === 'camera' && <CameraStep {...p} onReady={setReady} />}
       {step === 'aim' && <AimStep {...p} onReady={setReady} />}
@@ -62,11 +74,12 @@ export function FirstRun(p: Props) {
       {step === 'browser' && <BrowserStep />}
       {step === 'practice' && <Practice {...p} go={move} onDone={() => finish(true)} />}
 
-      {step !== 'practice' && <div className="row setup-nav">
-        {next && <button className="primary" disabled={!canGo} onClick={() => move(next)}>{optional && !ready ? t('Skip this step') : t('Next')}</button>}
-        {back && <button onClick={() => move(back)}>{t('Back')}</button>}
-      </div>}
-      <button className="link skip-setup" onClick={skipSetup}>{t('Skip setup')}</button>
+      <div className="row setup-nav">
+        {step !== 'practice' && back && <button className="quiet" onClick={() => move(back)}>{t('Back')}</button>}
+        <button className="quiet skip-setup" onClick={skipSetup}>{t('Skip setup')}</button>
+        <span className="grow" />
+        {step !== 'practice' && next && <button className="primary" disabled={!canGo} onClick={() => move(next)}>{optional && !ready ? t('Skip this step') : t('Next')}</button>}
+      </div>
     </div>
   );
 }
@@ -148,12 +161,10 @@ function Practice({ session: s, go, onDone }: Props & { onDone: () => void }) {
   const checkAim = guide.stage === 'nofire' && <button className={s.alarm ? 'on-alarm' : 'self-start'} onClick={async () => { await stop(); s.newSession(); go('aim'); }}>{t('Check the aim')}</button>;
   // Any alarm takes the whole window, as in a real session; the guide line stays visible on it.
   if (s.alarm) return (
-    <div className="study alarm-screen" role="alert" aria-live="assertive">
-      <p className="state-word"><Mark shape="triangle" />{alarmText(s.alarm)}</p>
-      <p className="alarm-advice">{guide.stage === 'putdown' || guide.stage === 'nofire' ? text : t('Practice: the alarm stops when you are back to studying.')}</p>
-      <div className="clock clock-sm"><ClockText text={hms(s.focusedMs / 1000)} /></div>
-      <div className="row">{checkAim}<button className="on-alarm quiet" onClick={stop}>{t('End practice')}</button></div>
-    </div>
+    <AlarmScreen alarm={s.alarm} className="study" clockLabel={t('Focused time')} clock={<ClockText text={hms(s.focusedMs / 1000)} />}
+                 note={guide.stage === 'putdown' || guide.stage === 'nofire' ? text : t('Practice: the alarm stops when you are back to studying.')}>
+      {checkAim}<button className="on-alarm" onClick={stop}>{t('End practice')}</button>
+    </AlarmScreen>
   );
   return <>
     <p className="state-word"><Mark shape={clockRunning ? 'circle' : 'square'} />{s.activity ? activityText(s.activity) : t('Starting')}</p>

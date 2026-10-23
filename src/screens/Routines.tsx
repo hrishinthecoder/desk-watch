@@ -84,7 +84,7 @@ function WeekBlock({ b, past, tasks, subjects, onOpen, onChanged }: { b: Block; 
     <div className={`block${b.skipped ? ' skipped' : ''}`}>
       <button className="block-open" disabled={b.skipped} title={tr('Get this block ready on the Study tab')} onClick={() => onOpen(b.id)}>
         <b>{when}</b><span>{name}</span>
-        <small>{b.skipped ? tr('Skipped this day') : b.moved ? tr('Moved this day') : [b.camera_mode ? tr('Camera') : '', b.screen_mode ? tr('Screen') : ''].filter(Boolean).join(' · ') || tr('Timer only')}</small>
+        <small>{b.skipped ? tr('Skipped this day') : b.moved ? tr('Moved this day') : [b.camera_mode ? tr('Camera') : '', b.screen_mode ? tr('Blocker') : ''].filter(Boolean).join(' · ') || tr('Timer only')}</small>
       </button>
       {!past && <span className="row block-day">
         {b.skipped || b.moved
@@ -135,7 +135,7 @@ function RoutineEditor({ set, tasks, subjects, weekStart, onDone }: { set: SetIn
       </div>
       <p className="muted">{tr('Changes apply from today; past days keep their plan, and sessions and stats never change.')}</p>
       <table className="slots">
-        <thead><tr><th>{tr('Days')}</th><th>{tr('Start time')}</th><th>{tr('End time')}</th><th>{tr('For')}</th><th>{tr('Camera')}</th><th>{tr('Screen')}</th><th /></tr></thead>
+        <thead><tr><th>{tr('Days')}</th><th>{tr('Start time')}</th><th>{tr('End time')}</th><th>{tr('For')}</th><th>{tr('Camera')}</th><th>{tr('Blocker')}</th><th /></tr></thead>
         <tbody>
           {slots.map((s, i) => (
             <tr key={i}>

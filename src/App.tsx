@@ -15,7 +15,7 @@ import { cameraProblem } from './state/camera';
 import { ALL_TOURS, isSetupStep, markSeen, seenTours, setupOnStart, type SetupStep, type TourId } from './state/setup';
 import { FirstRun } from './screens/FirstRun';
 import { Tour } from './screens/Tour';
-import { Focus, useFocus } from './screens/Focus';
+import { Focus, useFocus, useLightTheme } from './screens/Focus';
 import { backgroundColor } from './state/focus';
 import { usePlanner } from './screens/Planner';
 import { setLang, t as tr, tk } from '../electron/i18n';
@@ -73,17 +73,18 @@ export function App() {
   // Windows' minimise / maximise / close sit on the colour of whatever fills the top of the window (electron/main.ts,
   // window:colors): the page, the red alarm screen, or Focus mode's background (owner, 2026-10-23: never a white box).
   const screenTop = session.alarm ? 'alarm' : focus.view === 'full' ? 'focus' : 'page';
+  const light = useLightTheme(settings.theme);
   useEffect(() => {
     const paint = () => {
       const css = getComputedStyle(document.documentElement);
-      const color = screenTop === 'alarm' ? css.getPropertyValue('--alarm-bg') : screenTop === 'focus' ? backgroundColor(settings.focusBg) : css.getPropertyValue('--bg');
-      bridge().windowColors({ color: color.trim(), symbolColor: (screenTop === 'focus' ? '#ECEDF1' : css.getPropertyValue('--text')).trim() });
+      const color = screenTop === 'alarm' ? css.getPropertyValue('--alarm-bg') : screenTop === 'focus' ? backgroundColor(settings.focusBg, light) : css.getPropertyValue('--bg');
+      bridge().windowColors({ color: color.trim(), symbolColor: css.getPropertyValue('--text').trim() });
     };
     paint();
     const system = matchMedia('(prefers-color-scheme: dark)');
     system.addEventListener('change', paint);
     return () => system.removeEventListener('change', paint);
-  }, [settings.theme, screenTop, settings.focusBg]);
+  }, [settings.theme, screenTop, settings.focusBg, light]);
 
   // First-run setup: resumes at the saved step; never runs for someone who already has sessions.
   const [setup, setSetup] = useState<SetupStep | null>(() => (!settings.setupDone && isSetupStep(settings.setupStep) ? settings.setupStep : null));
@@ -142,7 +143,7 @@ export function App() {
       <ReminderBar volume={settings.alarmVolume} onReady={openBlock} />
       <BlockWarning screen={session.screen} running={session.phase === 'running'} />
       {tourId && <Tour key={tourId} id={tourId} onEnd={endTour} />}
-      <main className={withCamera ? `app${!setup && tab === 'debug' ? ' sticky-camera' : ''}` : `app single${!setup && tab === 'planner' ? ' wide' : ''}`}>
+      <main className={withCamera ? `app${!setup && tab === 'debug' ? ' sticky-camera' : ''}` : `app single${!setup && (tab === 'planner' || tab === 'history' || tab === 'settings') ? ' wide' : ''}`}>
         {/* The camera keeps running on every tab (the session needs it); off-tab it is only moved out of view. */}
         <section className={withCamera ? 'stage' : 'stage offscreen'}>
           <div className="mirror">

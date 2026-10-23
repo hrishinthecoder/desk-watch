@@ -10,7 +10,7 @@ import { playCue } from '../session/sounds';
 import type { Session, SessionOpts } from '../session/useSession';
 import type { Live } from '../detection/engine';
 import type { Settings } from '../state/config';
-import { afterPomodoro, BACKGROUNDS, backgroundColor, clockMs, dots, HOLD_ESC_MS, plannedFor, TIMER_MODES, timerMode, type TimerMode } from '../state/focus';
+import { afterPomodoro, backgrounds, backgroundColor, isLight, clockMs, dots, HOLD_ESC_MS, plannedFor, TIMER_MODES, timerMode, type TimerMode } from '../state/focus';
 import { cameraGate, CHECK_LIMIT_MS } from '../state/setup';
 import { days, estPomos, listTasks, MAX_POMOS, pomosDone, progressOf } from '../state/todo';
 import { STRICT_SENTENCE, strictOk } from './Study';
@@ -181,7 +181,8 @@ export function Focus({ f, session: s, settings, patch, tasks, reloadTasks, onFi
   const paused = s.phase === 'break' && s.activity === 'PAUSED';
   const liveSec = f.sessionOn && s.opts.taskId === task?.id ? s.focusedMs / 1000 : 0;
   const d = dots(settings, f.doneInRun, task ? { done: pomosDone(task.focused_sec + liveSec, settings.pomoMin), est: task.est_min ? estPomos(task.est_min, settings.pomoMin) : null } : null);
-  const style = { '--focus-bg': backgroundColor(settings.focusBg) } as React.CSSProperties;
+  const light = useLightTheme(settings.theme);
+  const style = { '--focus-bg': backgroundColor(settings.focusBg, light) } as React.CSSProperties;
   const end = () => { setExiting(false); setTyped(''); s.end(true); };
 
   // Alarms take over the whole screen, as on the Study tab.
@@ -301,7 +302,7 @@ export function Focus({ f, session: s, settings, patch, tasks, reloadTasks, onFi
           <small className="focus-note">{tr('Made on this computer; no sound files.')}</small>
         </>}
         {panel === 'background' && <div className="focus-cards" role="radiogroup" aria-label={tr('Background')}>
-          {BACKGROUNDS.map(([k, label, c]) => <button key={k} role="radio" aria-checked={settings.focusBg === k} onClick={() => patch({ focusBg: k })}><span className="swatch" style={{ background: c }} />{tr(label)}</button>)}
+          {backgrounds(light).map(([k, label, c]) => <button key={k} role="radio" aria-checked={settings.focusBg === k} onClick={() => patch({ focusBg: k })}><span className="swatch" style={{ background: c }} />{tr(label)}</button>)}
         </div>}
       </div>}
       <TodayDrawer open={drawer} tasks={tasks} settings={settings} current={f.taskId} reload={reloadTasks} onSwitch={(id) => { f.switchTask(id); setDrawer(false); }} />
@@ -388,4 +389,16 @@ function TodayDrawer({ open, tasks, settings, current, reload, onSwitch }: {
       {current !== null && <button className="focus-quiet" onClick={() => onSwitch(null)}>{tr('No task')}</button>}
     </aside>
   );
+}
+
+// Light or dark right now (Settings → Theme, or Windows when it is "system"); follows Windows when it changes.
+export function useLightTheme(theme: string) {
+  const query = '(prefers-color-scheme: light)';
+  const [system, setSystem] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const m = matchMedia(query), f = () => setSystem(m.matches);
+    m.addEventListener('change', f);
+    return () => m.removeEventListener('change', f);
+  }, []);
+  return isLight(theme, system);
 }

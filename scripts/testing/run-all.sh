@@ -6,7 +6,7 @@ set -u
 ROOT="${1:-}"
 test -n "$ROOT" || { echo "usage: run-all.sh <scratch folder>"; exit 1; }
 mkdir -p "$ROOT" || exit 1
-for c in power tabs todo board routines blocker focus day stats bangla extra debug-cam calib-sound sleepy-ui; do
+for c in power tabs todo board routines blocker focus day stats bangla extra debug-cam calib-sound sleepy-ui quiet; do
   DIR="$ROOT/tc-$c"
   rm -rf "$DIR" "$DIR.log"
   bash scripts/testing/test-copy.sh start "$DIR" || { echo "== $c: test copy did not start"; continue; }

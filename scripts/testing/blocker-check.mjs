@@ -86,6 +86,8 @@ ok('…counting down', /rings in [4-6] s/.test(await warning() ?? ''), await war
 await sleep(6500);
 ok('after 10 s: the alarm "Blocked app: Notepad"', (await blockedApp()) === 'Blocked app: Notepad' && !(await warning()), [await blockedApp(), await warning()]);
 await front('Google Chrome', 'chrome.exe');
+// The app reads the window in front about once a second: wait up to 4 s (it once failed after only 0.8 s).
+for (let i = 0; i < 8 && (await blockedApp()); i++) await sleep(500);
 ok('closed (another window in front): the alarm stops', !(await blockedApp()), await blockedApp());
 await front('Notepad', 'notepad.exe');
 ok('opened again: a warning first again', /Notepad is blocked/.test(await warning() ?? '') && !(await blockedApp()), [await warning(), await blockedApp()]);

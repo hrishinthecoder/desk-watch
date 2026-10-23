@@ -92,7 +92,8 @@ export function createScreen(opts: {
   askPair: (name: string) => Promise<boolean>; // shows "Allow this browser?" in Desk Watch
 }) {
   const readFg = foregroundReader(opts.appRoot);
-  let state = { sessionId: null as number | null, screenMode: false, blocking: false };
+  // quiet: the extension blocks websites' notifications (a running session with "Block website notifications" on).
+  let state = { sessionId: null as number | null, screenMode: false, blocking: false, quiet: false };
   let list: Entry[] = store.getBlocklist(opts.db());
   let tab: { host: string; t: number } | null = null;
   let lastSeen = 0; // last request from the extension
@@ -188,7 +189,7 @@ export function createScreen(opts: {
       visits.push({ host: site.host, at: now });
       tick();
     } else if (!block && shown?.mode === 'alarm' && !isBlockPage(url)) { shown = null; tick(); } // left the blocked site
-    return { block, active: state.blocking };
+    return { block, active: state.blocking, quiet: state.quiet };
   }
 
   const readBody = (req: IncomingMessage) => new Promise<string>((resolve, reject) => {

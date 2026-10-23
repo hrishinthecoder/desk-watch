@@ -63,6 +63,10 @@ export function Study(p: Props) {
   const [typed, setTyped] = useState('');
   const [hideHint, setHideHint] = useState(false); // the sleepy hint's ×; it comes back the next time
   useEffect(() => { if (!s.drowsy) setHideHint(false); }, [s.drowsy]);
+  // Windows' Do not disturb bar: once per session, not when Windows' notifications are already all off.
+  const [toastsOff, setToastsOff] = useState(true);
+  useEffect(() => { bridge().windowsToastsOff().then(setToastsOff, () => setToastsOff(false)); }, []);
+  const [dndShownFor, setDndShownFor] = useState<number | null>(null); // the session whose bar was closed
   const { tasks, routines } = usePlanner();
 
   if (s.phase === 'setup') return <Setup {...p} />;
@@ -145,6 +149,15 @@ export function Study(p: Props) {
             <span>{t('You look sleepy. Take a short break?')}</span>
             <button className="small" onClick={s.takeBreak}>{t('Break {min} min', { min: settings.breakMin })}</button>
             <button className="small quiet icon-btn" aria-label={t('Dismiss')} onClick={() => setHideHint(true)}><Icon name="close" size={12} /></button>
+          </div>
+        )}
+        {kind === 'running' && s.phase === 'running' && settings.dndReminder && !toastsOff && dndShownFor !== s.startedAt && (
+          <div className="note-bar dnd-hint" role="status">
+            <Icon name="bell" size={16} />
+            <span>{t('Windows notifications can still pop up. Turn on Do not disturb?')}</span>
+            <button className="small" onClick={() => { bridge().openDoNotDisturb(); setDndShownFor(s.startedAt); }}>{t('Open Windows setting')}</button>
+            <button className="small quiet" onClick={() => p.setSettings({ ...settings, dndReminder: false })}>{t('Don’t remind me')}</button>
+            <button className="small quiet icon-btn" aria-label={t('Dismiss')} onClick={() => setDndShownFor(s.startedAt)}><Icon name="close" size={12} /></button>
           </div>
         )}
         {kind === 'running' && s.opts.screenMode && <details className="more-panel">

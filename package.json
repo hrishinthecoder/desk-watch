@@ -1,7 +1,7 @@
 {
   "name": "desk-watch",
   "productName": "Desk Watch",
-  "version": "0.1.0-beta",
+  "version": "0.1.1-beta",
   "description": "Webcam study focus watcher for Windows. Everything stays on your computer.",
   "main": "dist-electron/main.js",
   "private": true,

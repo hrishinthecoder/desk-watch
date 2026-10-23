@@ -61,8 +61,11 @@ export function History({ onStudy, weekStart, pomoMin }: { onStudy: () => void; 
       {period === 'week' && <WeekReview data={data} now={now} weekStart={weekStart} tasks={tasks} pomoMin={pomoMin} />}
       {period === 'week' ? null : period === 'today'
         ? <DayView day={today} title={false} onOpen={(startedAt) => setView({ kind: 'session', startedAt, day: null })} />
-        : <>
+        : <div className="history-grid">
+          <div className="history-main">
           <ThreeNumbers segments={inPeriod.segments} events={inPeriod.events} />
+          <section className="chart-card">
+          {period !== 'all' && <h3>{t('Focused minutes per day')}</h3>}
           {period !== 'all' && <div className="bars" data-tour="bars" role="group" aria-label={t('Focused minutes per day, last {days} days', { days })}>
             {shown.map((d, i) => {
               const dayStart = addDays(from, i);
@@ -80,8 +83,10 @@ export function History({ onStudy, weekStart, pomoMin }: { onStudy: () => void; 
             })}
           </div>}
           <p className="muted">{period !== 'all' && <>{t('Click a day to see its sessions.')} {t('The number above a day is its pomodoros.')} </>}{streakDays ? t(plural(streakDays, 'Day streak: {n} day.', 'Day streak: {n} days.'), { n: streakDays }) : ''}</p>
+          </section>
+          </div>
           <ByTable data={inPeriod} tasks={tasks} pomoMin={pomoMin} />
-        </>}
+        </div>}
     </div>
   );
 }
@@ -97,9 +102,10 @@ function WeekReview({ data, now, weekStart, tasks, pomoMin }: { data: Range; now
   const from = fmtDate(r.start, { weekday: 'long', day: 'numeric', month: 'long' });
   if (!r.segments.length) return <p className="muted">{t('No sessions this week yet (the week started on {date}).', { date: from })}</p>;
   return (
-    <>
+    <div className="history-grid">
+      <div className="history-main">
       <ThreeNumbers segments={r.segments} events={r.events} />
-      <dl className="review">
+      <dl className="review chart-card">
         <dt>{t('Best day')}</dt>
         <dd>{r.bestDay ? t('{day}, {time} focused.', { day: dayName(r.bestDay.day), time: hms(r.bestDay.sec) }) : t('No focused time yet.')}</dd>
         <dt>{t('Top distraction')}</dt>
@@ -108,8 +114,9 @@ function WeekReview({ data, now, weekStart, tasks, pomoMin }: { data: Range; now
         <dd>{pickupsLine(r.pickups, r.lastPickups)}</dd>
       </dl>
       <p className="muted">{t('The week started on {date}.', { date: from })}</p>
+      </div>
       <ByTable data={week} tasks={tasks} pomoMin={pomoMin} />
-    </>
+    </div>
   );
 }
 
@@ -121,9 +128,10 @@ function ByTable({ data, tasks, pomoMin }: { data: Pick<Range, 'sessions' | 'seg
   if (!rows.length) return null;
   return (
     <section className="by-table">
+      <header><h3>{t('Breakdown')}</h3>
       <div className="cards compact" role="radiogroup" aria-label={t('Stats')}>
         {BY.map(([k, text]) => <button key={k} role="radio" aria-checked={by === k} className="card" onClick={() => setBy(k)}><b>{t(text)}</b></button>)}
-      </div>
+      </div></header>
       <table>
         <thead><tr><th>{t(BY.find(([k]) => k === by)![2])}</th><th>{t('Focused')}</th><th>{t('Pomodoros')}</th><th>{t('Sessions')}</th><th>{t('Distractions')}</th></tr></thead>
         <tbody>

@@ -44,6 +44,8 @@ type Bridge = {
   restoreBackup(name: string): Promise<string>; // 'ok' or why nothing was changed
 
   setBlocking(on: boolean): void;
+  windowsToastsOff(): Promise<boolean>; // every app's Windows notifications are switched off already
+  openDoNotDisturb(): Promise<void>;     // opens Windows' notification settings (Do not disturb is there)
   screenInfo(): Promise<{ code: string; port: number; lastSeen: number; serverError: string; browsers: { name: string; origin: string; added: number }[] } | null>;
   answerPair(allow: boolean): void;
   removeBrowser(origin: string): Promise<void>;

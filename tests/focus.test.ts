@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { afterPomodoro, breakAfter, clockMs, dots, plannedFor, timerMode } from '../src/state/focus';
+import { afterPomodoro, backgroundColor, isLight, breakAfter, clockMs, dots, plannedFor, timerMode } from '../src/state/focus';
 import { noiseSamples } from '../src/session/noise';
 
 const cfg = { timerMode: 'pomodoro', pomoMin: 25, shortBreakMin: 5, longBreakMin: 15, longEvery: 4, pomoCount: 4, countdownMin: 40, countupMaxMin: 120 };
@@ -54,5 +54,21 @@ describe('noise', () => {
   it('brown noise loops without a jump', () => {
     const b = noiseSamples('brown', 48_000, rand);
     expect(Math.abs(b[b.length - 1] - b[0])).toBeLessThan(0.01);
+  });
+});
+
+describe('Focus backgrounds follow the theme', () => {
+  it('light or dark: Settings first, Windows only for "system"', () => {
+    expect(isLight('light', false)).toBe(true);
+    expect(isLight('dark', true)).toBe(false);
+    expect(isLight('system', true)).toBe(true);
+    expect(isLight('system', false)).toBe(false);
+  });
+  it('the same choice has a dark and a light colour; unknown falls back to the first', () => {
+    expect(backgroundColor('green')).toBe('#0e2a20');
+    expect(backgroundColor('green', true)).toBe('#E9F3EC');
+    expect(backgroundColor('black', true)).toBe('#FBFAF7');
+    expect(backgroundColor('nonsense', true)).toBe('#FBFAF7');
+    expect(backgroundColor('nonsense')).toBe('#000000');
   });
 });

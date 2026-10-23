@@ -41,6 +41,8 @@ contextBridge.exposeInMainWorld('deskwatch', {
   screenInfo: () => ipcRenderer.invoke('screen:info'),
   newPairingCode: () => ipcRenderer.invoke('screen:new-code'),
   openExtensionFolder: () => ipcRenderer.invoke('screen:open-extension-folder'),
+  windowsToastsOff: () => ipcRenderer.invoke('windows:toasts-off'),
+  openDoNotDisturb: () => ipcRenderer.invoke('windows:open-dnd'),
   getBlocklist: () => ipcRenderer.invoke('blocklist:get'),
   setBlocklist: (entries: object[]) => ipcRenderer.invoke('blocklist:set', entries),
   blockSets: () => ipcRenderer.invoke('blocksets:get'),

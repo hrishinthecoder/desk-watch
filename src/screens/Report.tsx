@@ -98,7 +98,7 @@ export function SessionReport({ startedAt }: { startedAt: number }) {
         {` · ${t(plural(p, '{n} pomodoro', '{n} pomodoros'), { n: p })}`}</p>}
       {sess && <p className="sentence">{reportSentence(summarize(data.segments), sess.planned_min, !!sess.camera_mode)}</p>}
       <ThreeNumbers segments={data.segments} events={data.events} />
-      <Timeline segments={data.segments} events={data.events} />
+      <section className="chart-card"><h3>{t('Timeline')}</h3><Timeline segments={data.segments} events={data.events} /></section>
       <Details segments={data.segments} data={data} />
     </div>
   );

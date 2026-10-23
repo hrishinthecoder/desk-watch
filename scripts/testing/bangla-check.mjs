@@ -20,7 +20,7 @@ const KEEP = new Set(`Desk Watch Chrome Edge Windows Firefox CSV JSON Esc Tab En
   X Reddit Netflix My list Exam Light Physics Maths Chemistry English History Chapter exercises Integration worksheet Read organic chemistry
   notes Essay draft Revise formulas Lab report Poem analysis Return library books Questions Results table Graph Conclusion Study fake
   file capture video y4m Users AppData Local Temp claude scratchpad deskwatch db tc bn HRISHI desk watch C
-  Focus Screen Blocker Strict mode Pomodoro Break Long break Board Calibration calibrate Countdown Count up Debug Dark White Pink Brown noise Session`.split(/\s+/));
+  Focus Screen Blocker Strict mode Pomodoro Break Long break Board Calibration calibrate Countdown Count up Debug Dark White Pink Brown noise Session notification browser extension Do not disturb Windows Chrome Edge`.split(/\s+/));
 // The last line: app terms kept in Latin script in Bangla on purpose (owner's wording rule, 2026-10-23; scripts/bangla-terms.mjs).
 // The page text without file paths (<code>) and the camera list (the fake camera's file name).
 const english = () => p.ev(`const b = document.body.cloneNode(true); b.querySelectorAll('code, select, .stage').forEach((e) => e.remove());
@@ -94,7 +94,7 @@ ok('Focus mode: Bangla buttons and clock', (await p.text('.focus-primary'))?.inc
 await shot(p, join(out, 'bn-focus.png'));
 await leftover('Focus mode');
 await p.click('শেষ করুন', '.focus-quiet');
-await p.click('সেশন শেষ করুন', '.focus-dialog button');
+await p.click('Session শেষ করুন', '.focus-dialog button');
 await sleep(1500);
 
 // The Debug tab stays English

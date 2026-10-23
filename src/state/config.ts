@@ -14,6 +14,8 @@ export type Config = {
   theme: Theme;
   language: string;      // 'en' | 'bn' (electron/i18n.ts); Settings → App
   routineReminders: boolean; // a notification when a routine block starts (Stage E)
+  quietSites: boolean;  // during a running session the browser extension blocks websites' notifications (owner, 2026-10-23)
+  dndReminder: boolean; // at the start of a session, a bar that opens Windows' Do not disturb setting
   showDebug: boolean;    // the Debug tab (test clips, tuning); Settings → Advanced, off for new users
   setupDone: boolean;    // first-run setup finished or skipped (E2 Part 3)
   setupStep: string;     // the setup step to resume at after a restart ('' = not started)
@@ -113,6 +115,8 @@ export const DEFAULTS: Config = {
   theme: 'system',
   language: 'en',
   routineReminders: true,
+  quietSites: true,
+  dndReminder: true,
   showDebug: false,
   setupDone: false,
   setupStep: '',
